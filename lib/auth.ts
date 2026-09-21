@@ -3,6 +3,11 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
+// Hash descartável comparado quando o email não existe, para que o login
+// demore parecido com e sem usuário cadastrado (evita descobrir quais emails
+// existem medindo o tempo de resposta). Usa o mesmo custo (10) do seed.
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync("senha-descartavel", 10);
+
 export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
@@ -26,16 +31,12 @@ export const authOptions: AuthOptions = {
           where: { email: credentials.email },
         });
 
-        if (!user) {
-          return null;
-        }
-
         const isValid = await bcrypt.compare(
           credentials.password,
-          user.passwordHash
+          user?.passwordHash ?? DUMMY_PASSWORD_HASH
         );
 
-        if (!isValid) {
+        if (!user || !isValid) {
           return null;
         }
 
