@@ -1,60 +1,36 @@
-#  Goncadasvendas
-> **E-commerce de vendas em geral**
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-##  Tipos de Usuários
+## Getting Started
 
-### **Cliente**
-* Visualizar produtos.
-* Criar conta e fazer login.
-* Adicionar produtos ao carrinho.
-* Finalizar compras.
-* Visualizar pedidos.
+First, run the development server:
 
-### **Administrador**
-* Gerenciar produtos (CRUD).
-* Gerenciar pedidos.
-* Gerenciar usuários.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
----
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-##Requisitos Funcionais
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-###Autenticação
-* **RF01:** O sistema deve permitir cadastro de usuários.
-* **RF02:** O sistema deve permitir login e logout.
-* **RF03:** O sistema deve diferenciar usuários do tipo cliente e administrador.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-###Produtos
-* **RF04:** O administrador deve poder cadastrar produtos.
-* **RF05:** O administrador deve poder editar produtos.
-* **RF06:** O administrador deve poder excluir produtos.
-* **RF07:** O sistema deve exibir a lista de produtos.
-* **RF08:** O sistema deve exibir os detalhes de um produto.
+## Learn More
 
-###Carrinho e Compras
-* **RF09:** O cliente deve poder adicionar produtos ao carrinho.
-* **RF10:** O cliente deve poder remover produtos do carrinho.
-* **RF11:** O sistema deve calcular automaticamente o valor total da compra.
-* **RF12:** O cliente deve poder finalizar o pedido.
+To learn more about Next.js, take a look at the following resources:
 
-###Pedidos
-* **RF13:** O sistema deve registrar pedidos realizados.
-* **RF14:** O cliente deve poder visualizar seus pedidos.
-* **RF15:** O administrador deve poder visualizar todos os pedidos.
-* **RF16:** O administrador deve poder atualizar o status do pedido (ex: pendente, enviado).
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-###Usuários
-* **RF17:** O administrador deve poder visualizar usuários cadastrados.
-* **RF18:** O administrador deve poder excluir usuários.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
----
+## Deploy on Vercel
 
-##Requisitos Não Funcionais
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-* **RNF01:** O sistema deve ser responsivo, adaptando-se a diferentes tamanhos de tela (desktop e mobile).
-* **RNF02:** O sistema deve garantir autenticação segura (criptografia de senhas e uso de tokens).
-* **RNF03:** O sistema deve possuir proteção contra vulnerabilidades comuns (SQL Injection, XSS, CSRF).
-* **RNF04:** O sistema deve apresentar bom desempenho, com tempo de resposta adequado.
-* **RNF05:** A interface deve ser intuitiva e de fácil usabilidade.
-
-http://localhost:8000/Untitled-1.php
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
