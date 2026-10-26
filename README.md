@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GoncadasVendas
 
-## Getting Started
+Plataforma web de gestão de vendas para pequenos comércios. Projeto de Portfólio do curso
+(Católica SC), avaliado pelo [The Portfolio Playbook](https://github.com/CatolicaSC-Portfolio/The-Portfolio-Playbook).
 
-First, run the development server:
+## O que é
+
+Loja online simples: o cliente se cadastra, navega pelo catálogo, monta o carrinho, cadastra
+um endereço e finaliza o pedido. O admin cadastra produtos (com imagens) e acompanha os pedidos.
+O escopo completo (casos de uso e regras de negócio) está descrito em `CLAUDE.md`.
+
+## Stack
+
+- [Next.js](https://nextjs.org) 16 (App Router) + TypeScript (strict) + Tailwind 4
+- [NextAuth](https://next-auth.js.org) v4 (Credentials, JWT) + bcryptjs
+- [Prisma](https://www.prisma.io) + PostgreSQL
+- [Zod](https://zod.dev) para validação de entrada
+- Imagens em Azure Blob Storage
+- Testes com [Vitest](https://vitest.dev) (backend) e Testing Library (frontend)
+- Observabilidade com Application Insights (`@azure/monitor-opentelemetry`)
+- Docker (imagem publicada no GHCR) · Terraform (`infra/`) · Azure Container Apps
+- CI/CD no GitHub Actions · Qualidade de código no SonarCloud
+
+## Como rodar localmente
+
+Pré-requisitos: Node 20+, Docker.
+
+1. Subir um Postgres local:
+   ```bash
+   docker run -e POSTGRES_PASSWORD=dev -p 5432:5432 postgres:16
+   ```
+2. Criar um `.env` na raiz com:
+   ```bash
+   DATABASE_URL="postgresql://postgres:dev@localhost:5432/postgres?schema=public"
+   NEXTAUTH_SECRET="qualquer-string-aleatoria"
+   NEXTAUTH_URL="http://localhost:3000"
+   ```
+3. Instalar dependências, migrar o banco e popular dados de exemplo:
+   ```bash
+   npm install
+   npx prisma migrate dev
+   npm run seed
+   ```
+4. Rodar o projeto:
+   ```bash
+   npm run dev
+   ```
+   Abra [http://localhost:3000](http://localhost:3000).
+
+## Testes
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run test:backend   # services/, repositories/, lib/ — cobertura mínima 75%
+npm run test:frontend  # components/ — cobertura mínima 25%
+npm test               # os dois
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Links
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Wiki (requisitos, user stories, arquitetura, decisões): em construção — issue de documentação da Semana 1.
+- Deploy em produção: em construção — issues de infraestrutura e CI/CD da Semana 1.
