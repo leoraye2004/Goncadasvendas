@@ -41,7 +41,7 @@ afterEach(() => vi.restoreAllMocks());
 
 describe("register", () => {
   it("cadastra com sucesso e guarda a senha como hash bcrypt", async () => {
-    repo.create.mockImplementation(async (data) => usuario({ ...data, id: "novo" }));
+    repo.create.mockResolvedValue(usuario({ id: "novo" }));
 
     const result = await createAuthService(repo).register(cadastro);
 
