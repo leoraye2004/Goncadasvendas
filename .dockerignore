@@ -1,0 +1,17 @@
+# Fora do contexto do build: o que é gerado, local ou secreto.
+node_modules
+.next
+coverage
+.git
+.github
+.env*
+tsconfig.tsbuildinfo
+
+# Material que não vai na imagem (imagens legadas ficam no Blob, não na imagem).
+docs
+infra
+imagens
+img
+*.md
+Dockerfile
+.dockerignore
