@@ -17,8 +17,6 @@ export default defineConfig({
       exclude: [
         // Só liga o Prisma ao banco, não tem regra de negócio.
         "lib/prisma.ts",
-        // TODO(#5): sai desta lista quando o auth passar a usar o auth-service (com testes).
-        "lib/auth.ts",
       ],
       reporter: ["text", "lcov"],
       reportsDirectory: "coverage/backend",
