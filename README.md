@@ -55,6 +55,25 @@ npm run test:frontend  # components/ — cobertura mínima 25%
 npm test               # os dois
 ```
 
+## Rodando com Docker
+
+Gera a mesma imagem que vai para produção (Next.js em modo `standalone`, usuário não-root).
+Ao subir, o container aplica as migrations pendentes e só então inicia o servidor.
+
+```bash
+docker build -t goncadasvendas:local .
+```
+
+```bash
+docker run -p 3000:3000 --add-host=host.docker.internal:host-gateway \
+  -e DATABASE_URL="postgresql://postgres:dev@host.docker.internal:5432/postgres?schema=public" \
+  -e NEXTAUTH_SECRET="qualquer-string-aleatoria" -e NEXTAUTH_URL="http://localhost:3000" \
+  goncadasvendas:local
+```
+
+- `GET /api/health` mostra o estado do app e do banco: **200** quando está tudo de pé, **503** quando o banco não responde.
+- `APPLICATIONINSIGHTS_CONNECTION_STRING` (opcional) liga o monitoramento no Application Insights. Sem ela, o app roda normalmente.
+
 ## Links
 
 - Wiki (requisitos, user stories, arquitetura, decisões): em construção — issue de documentação da Semana 1.
