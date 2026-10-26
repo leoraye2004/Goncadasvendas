@@ -21,7 +21,20 @@ Saídas (`terraform output`): URL do app, nome do servidor Postgres, Storage Acc
 
 ## Antes de começar
 
-- `az login` e confira a assinatura: `az account show` (precisa ser *Azure for Students*).
+- Entre no Azure **com MFA** (a Católica SC exige para criar recursos) e confira a assinatura:
+  ```bash
+  az login --tenant "1b8aed44-a7d0-409c-9796-b264594986a0" --scope "https://management.core.windows.net//.default"
+  az account show
+  ```
+  Precisa ser *Azure for Students*. Se aparecer o erro `AADSTS50076`, o `az` mostra um `az login ... --claims-challenge ...`; rode esse comando.
+- Registre os provedores (grátis; o Terraform **não** registra sozinho com `resource_provider_registrations = "none"`):
+  ```bash
+  az provider register --wait -n Microsoft.Insights
+  az provider register --wait -n Microsoft.OperationalInsights
+  az provider register --wait -n Microsoft.App
+  az provider register --wait -n Microsoft.DBforPostgreSQL
+  az provider register --wait -n Microsoft.Storage
+  ```
 - Terraform 1.9 ou superior (`terraform version`).
 - **A imagem do app precisa existir no GHCR e estar pública**, senão o Container App não consegue subir:
   ```bash
@@ -64,6 +77,11 @@ Saídas (`terraform output`): URL do app, nome do servidor Postgres, Storage Acc
 6. **Conferir o custo** depois de cada `apply` (CLAUDE.md): no portal, *Cost Management + Billing*, ou
    `az consumption usage list --top 20`. Deve ficar zerado.
 
+## Como ficou (aplicado em 26/10/2026)
+
+`/api/health` na URL pública respondeu 200 com app e banco no ar. O `apply` rodou em duas etapas por causa do
+provedor `Microsoft.Insights` (hoje documentado acima). Os planos salvos (`tfplan`) contêm segredos: apague depois do uso.
+
 ## Para apagar tudo
 
 ```bash
@@ -80,6 +98,6 @@ terraform destroy -var "subscription_id=$(az account show --query id -o tsv)"
 - **Plano gratuito do Postgres:** vale por 12 meses. Depois disso o servidor passa a ser cobrado.
 - **Imagem do app:** o Terraform ignora trocas na imagem (`ignore_changes`), porque o pipeline publica uma nova a
   cada merge com `az containerapp update --image`.
-- **Provedores:** esta assinatura vem com os provedores desligados; o Terraform registra os cinco necessários
-  (`Microsoft.App`, `DBforPostgreSQL`, `Insights`, `OperationalInsights`, `Storage`). É de graça.
+- **Provedores:** esta assinatura vem com os provedores desligados. Registre os cinco (comandos acima) antes do `apply`;
+  sem `Microsoft.Insights` o `apply` para no Application Insights. É de graça.
 - Verificações sem tocar na Azure: `terraform fmt -check` e `terraform validate`.
