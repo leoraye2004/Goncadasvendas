@@ -8,6 +8,7 @@ const dadosValidos = {
   name: "Ana Souza",
   email: "ana@example.com",
   cpf: CPF_VALIDO,
+  birthDate: "1990-05-20",
   password: "senha1234",
 };
 
@@ -51,6 +52,20 @@ describe("registerUserSchema", () => {
 
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error.issues[0].message).toBe("CPF inválido");
+  });
+
+  it("converte a data de nascimento para Date", () => {
+    const result = registerUserSchema.parse(dadosValidos);
+
+    expect(result.birthDate).toBeInstanceOf(Date);
+    expect(result.birthDate.toISOString().slice(0, 10)).toBe("1990-05-20");
+  });
+
+  it("rejeita data de nascimento impossível, futura, antiga demais ou que não é data", () => {
+    for (const birthDate of ["1990-02-31", "2999-01-01", "1850-01-01", "ontem", ""]) {
+      const result = registerUserSchema.safeParse({ ...dadosValidos, birthDate });
+      expect(result.success, `deveria rejeitar "${birthDate}"`).toBe(false);
+    }
   });
 
   it("rejeita nome vazio", () => {

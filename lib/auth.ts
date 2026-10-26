@@ -1,7 +1,19 @@
 import { type AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { createUserRepository } from "@/repositories/user-repository";
+import { createAuthService } from "@/services/auth-service";
+
+// Único lugar onde o service é ligado ao repositório. O NextAuth e as páginas usam esta instância.
+export const authService = createAuthService(createUserRepository(prisma));
+
+// Chamado pelo NextAuth no login. Toda a regra (senha, usuário apagado, tempo igual) fica no service.
+export async function authorizeCredentials(
+  credentials: Record<"email" | "password", string> | undefined
+) {
+  if (!credentials?.email || !credentials?.password) return null;
+  return authService.authenticate(credentials.email, credentials.password);
+}
 
 export const authOptions: AuthOptions = {
   session: {
@@ -17,35 +29,7 @@ export const authOptions: AuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Senha", type: "password" },
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (!user) {
-          return null;
-        }
-
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          user.passwordHash
-        );
-
-        if (!isValid) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        };
-      },
+      authorize: authorizeCredentials,
     }),
   ],
   callbacks: {

@@ -66,6 +66,7 @@ SSH/FTP · segredos commitados (usar GitHub Secrets / variáveis de ambiente) ·
 - Conventional Commits, commits pequenos (um passo de TDD = um commit é ótimo).
 - PR só é mergeado com CI verde e Quality Gate do Sonar aprovado.
 - Ao terminar uma issue: atualizar a página correspondente da Wiki do GitHub.
+- Não adicionar Co-Authored-By nem "Generated with Claude Code" em commits e PRs.
 
 ## Autoria (o Leo vai defender cada linha na prova de autoria)
 - Explique em português, no PR e no chat, o que fez e por quê, em linguagem simples.
