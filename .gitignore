@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# terraform (o state fica no Azure; backend.hcl e planos locais não vão para o git)
+infra/.terraform/
+infra/*.tfstate*
+infra/backend.hcl
+infra/*.tfvars
+infra/tfplan

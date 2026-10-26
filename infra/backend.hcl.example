@@ -1,0 +1,6 @@
+# Copie para backend.hcl (ignorado pelo git) e preencha com o que o bootstrap-state.ps1 mostrou.
+# Depois: terraform init -backend-config=backend.hcl
+resource_group_name  = "rg-goncadasvendas-tfstate"
+storage_account_name = "stgvtfstateXXXXX"
+container_name       = "tfstate"
+key                  = "goncadasvendas.tfstate"
