@@ -3,18 +3,18 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import FormError from "@/components/FormError";
 
 const campo = "mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500";
 
 // UC02 — login. A mensagem de erro é sempre a mesma, para não revelar se o e-mail existe.
-export default function LoginForm({ justRegistered = false }: { justRegistered?: boolean }) {
+export default function LoginForm({ justRegistered = false }: Readonly<{ justRegistered?: boolean }>) {
   const router = useRouter();
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const dados = new FormData(event.currentTarget);
     setError(undefined);
@@ -43,9 +43,9 @@ export default function LoginForm({ justRegistered = false }: { justRegistered?:
       <h1 className="text-2xl font-semibold">Entrar</h1>
 
       {justRegistered && (
-        <p role="status" className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-800">
+        <output className="block rounded-md bg-green-50 px-3 py-2 text-sm text-green-800">
           Cadastro concluído! Entre com seu e-mail e senha.
-        </p>
+        </output>
       )}
 
       <div>

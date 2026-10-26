@@ -41,6 +41,8 @@ Pré-requisitos: Node 20+, Docker.
    npx prisma migrate dev
    npm run seed
    ```
+   As senhas do admin e do cliente de exemplo vêm de `SEED_ADMIN_PASSWORD` e `SEED_CUSTOMER_PASSWORD`;
+   se não definir, o seed gera senhas aleatórias e mostra no terminal.
 4. Rodar o projeto:
    ```bash
    npm run dev
