@@ -1,6 +1,6 @@
 name: CI
 
-# Roda em todo PR e em todo push na main. O deploy no Azure entra depois da #7.
+# Roda em todo PR e em todo push na main. Na main, publica a imagem no GHCR. O deploy no Azure entra depois da #7.
 on:
   pull_request:
   push:
@@ -54,3 +54,40 @@ jobs:
         if: env.SONAR_TOKEN == ''
         run: |
           echo "::warning title=SonarCloud pulado::O secret SONAR_TOKEN não existe neste repositório (ou este PR veio de um fork). Lint e testes rodaram, mas a análise de qualidade NÃO."
+
+  # Em PR só constrói a imagem (para pegar erro de Dockerfile). Na main, também publica no GHCR.
+  imagem:
+    name: Imagem Docker (GHCR)
+    needs: qualidade
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write # permite ao GITHUB_TOKEN publicar o pacote no GHCR
+    env:
+      IMAGEM: ghcr.io/leoraye2004/goncadasvendas
+      PUBLICAR: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4.4.1
+
+      - name: Login no GHCR
+        if: env.PUBLICAR == 'true'
+        uses: docker/login-action@v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Construir (e publicar, na main)
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          push: ${{ env.PUBLICAR == 'true' }}
+          tags: |
+            ${{ env.IMAGEM }}:${{ github.sha }}
+            ${{ env.IMAGEM }}:latest
+          labels: org.opencontainers.image.source=https://github.com/leoraye2004/Goncadasvendas
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
