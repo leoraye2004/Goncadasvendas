@@ -20,6 +20,16 @@ export function isValidCpf(valor: string): boolean {
   return digitoVerificador(9) === Number(cpf[9]) && digitoVerificador(10) === Number(cpf[10]);
 }
 
+/** Aceita só "AAAA-MM-DD" que exista de verdade (31/02 não), não seja futura e seja de 1900 em diante. */
+function isValidBirthDate(valor: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) return false;
+  const data = new Date(`${valor}T00:00:00Z`);
+  if (Number.isNaN(data.getTime())) return false;
+  // O JavaScript "corrige" datas impossíveis (31/02 vira 03/03): só vale se voltar igual.
+  if (data.toISOString().slice(0, 10) !== valor) return false;
+  return data <= new Date() && data.getUTCFullYear() >= 1900;
+}
+
 // UC01 — cadastro de usuário. O CPF fica só com dígitos e o e-mail em minúsculas.
 export const registerUserSchema = z.object({
   name: z.string().trim().min(1, "Informe o nome").max(100, "Nome muito longo"),
@@ -28,6 +38,10 @@ export const registerUserSchema = z.object({
     .string()
     .transform(somenteDigitos)
     .refine(isValidCpf, "CPF inválido"),
+  birthDate: z
+    .string()
+    .refine(isValidBirthDate, "Data de nascimento inválida")
+    .transform((valor) => new Date(`${valor}T00:00:00Z`)),
   // 72 é o limite do bcrypt: acima disso o hash ignora o resto da senha.
   password: z
     .string()
