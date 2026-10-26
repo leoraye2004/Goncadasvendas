@@ -82,6 +82,26 @@ Saídas (`terraform output`): URL do app, nome do servidor Postgres, Storage Acc
 `/api/health` na URL pública respondeu 200 com app e banco no ar. O `apply` rodou em duas etapas por causa do
 provedor `Microsoft.Insights` (hoje documentado acima). Os planos salvos (`tfplan`) contêm segredos: apague depois do uso.
 
+## Deploy automático (GitHub Actions → Azure por OIDC)
+
+O job `deploy` do `ci-cd.yml` entra no Azure **sem senha**: o GitHub prova quem é (OIDC) e a Azure confia
+só na branch `main` deste repositório. Isto foi criado uma vez, fora do Terraform (login com MFA, ver acima):
+
+```bash
+az ad app create --display-name gh-goncadasvendas-deploy            # devolve o appId (AZURE_CLIENT_ID)
+az ad sp create --id <appId>                                        # devolve o id do service principal
+az ad app federated-credential create --id <appId> --parameters cred.json
+az role assignment create --assignee-object-id <sp-id> --assignee-principal-type ServicePrincipal   --role Contributor --scope /subscriptions/<assinatura>/resourceGroups/rg-goncadasvendas
+```
+
+`cred.json`: `issuer` `https://token.actions.githubusercontent.com`, `audiences` `["api://AzureADTokenExchange"]` e
+`subject` `repo:leoraye2004/Goncadasvendas:ref:refs/heads/main`. O papel *Contributor* vale só para o grupo
+`rg-goncadasvendas` (não para a assinatura). Secrets no GitHub: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`,
+`AZURE_SUBSCRIPTION_ID` (são identificadores, não senhas).
+
+Se o tenant bloquear o *app registration*, a alternativa é uma *User-Assigned Managed Identity* em `rg-goncadasvendas`
+com a mesma credencial federada.
+
 ## Para apagar tudo
 
 ```bash

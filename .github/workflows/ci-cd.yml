@@ -1,6 +1,6 @@
 name: CI
 
-# Roda em todo PR e em todo push na main. Na main, publica a imagem no GHCR. O deploy no Azure entra depois da #7.
+# Roda em todo PR e em todo push na main. Na main, publica a imagem no GHCR e faz o deploy no Azure.
 on:
   pull_request:
   push:
@@ -91,3 +91,51 @@ jobs:
           labels: org.opencontainers.image.source=https://github.com/leoraye2004/Goncadasvendas
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # Só na main. Troca a imagem do Container App pela do commit e confere se o app responde.
+  # Entra no Azure por OIDC (sem senha guardada). Se os secrets do Azure não existirem, avisa e pula.
+  deploy:
+    name: Deploy no Azure
+    needs: imagem
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write # permite pedir o token OIDC ao GitHub
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      GRUPO: rg-goncadasvendas
+      APP: ca-goncadasvendas
+    steps:
+      - name: Aviso - Azure não configurado
+        if: env.AZURE_CLIENT_ID == ''
+        run: |
+          echo "::warning title=Deploy pulado::Faltam os secrets AZURE_CLIENT_ID, AZURE_TENANT_ID e AZURE_SUBSCRIPTION_ID."
+
+      - name: Login no Azure (OIDC)
+        if: env.AZURE_CLIENT_ID != ''
+        uses: azure/login@v3.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Trocar a imagem do Container App
+        if: env.AZURE_CLIENT_ID != ''
+        run: |
+          az containerapp update -g "$GRUPO" -n "$APP"             --image "ghcr.io/leoraye2004/goncadasvendas:${{ github.sha }}"
+
+      # O app pode estar dormindo (0 réplicas) e a nova revisão leva um tempo para subir: tenta por até ~5 min.
+      - name: Teste rápido em /api/health
+        if: env.AZURE_CLIENT_ID != ''
+        run: |
+          fqdn=$(az containerapp show -g "$GRUPO" -n "$APP" --query properties.configuration.ingress.fqdn -o tsv)
+          for tentativa in $(seq 1 20); do
+            codigo=$(curl -s -o /dev/null -m 20 -w "%{http_code}" "https://$fqdn/api/health" || true)
+            echo "tentativa $tentativa: HTTP $codigo"
+            [ "$codigo" = "200" ] && exit 0
+            sleep 15
+          done
+          echo "::error::/api/health não respondeu 200"
+          exit 1
