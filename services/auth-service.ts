@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
 import type { Role } from "@prisma/client";
 import { registerUserSchema } from "@/lib/validation/user";
@@ -5,10 +6,10 @@ import type { UserRepository } from "@/repositories/user-repository";
 
 const CUSTO_BCRYPT = 10;
 
-// Hash de uma senha descartável, com o MESMO custo (10) dos hashes reais. Quando o e-mail não
-// existe, comparamos a senha com ele só para gastar o mesmo tempo: sem isso, a resposta mais
-// rápida denunciaria quais e-mails têm cadastro.
-const HASH_DESCARTAVEL = "$2b$10$c4fznCl2cf8Dc431XoheROsJTLdXijt2HadqtbMaqtny9Bf/2rsnC";
+// Hash de uma senha aleatória e descartável, com o MESMO custo (10) dos hashes reais. Quando o e-mail
+// não existe, comparamos a senha com ele só para gastar o mesmo tempo: sem isso, a resposta mais
+// rápida denunciaria quais e-mails têm cadastro. É gerado ao carregar o módulo (nada fixo no código).
+const HASH_DESCARTAVEL = bcrypt.hash(randomBytes(16).toString("hex"), CUSTO_BCRYPT);
 
 export type SessionUser = { id: string; name: string; email: string; role: Role };
 
@@ -59,7 +60,7 @@ export function createAuthService(users: UserRepository) {
     const ativo = user && !user.deletedAt ? user : null;
 
     // Roda o bcrypt SEMPRE, exista o usuário ou não, para o tempo de resposta ser igual.
-    const senhaCerta = await bcrypt.compare(password, ativo?.passwordHash ?? HASH_DESCARTAVEL);
+    const senhaCerta = await bcrypt.compare(password, ativo?.passwordHash ?? (await HASH_DESCARTAVEL));
 
     return ativo && senhaCerta ? toSessionUser(ativo) : null;
   }

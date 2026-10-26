@@ -1,16 +1,24 @@
 import { PrismaClient, Role } from "@prisma/client";
+import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-// Pode sobrescrever via env (SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD / SEED_ADMIN_NAME)
-// antes de rodar `npm run seed`. Se não definir, troque os placeholders abaixo.
+// Pode sobrescrever via env (SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD / SEED_ADMIN_NAME, e o mesmo
+// para o cliente) antes de rodar `npm run seed`. Nenhuma senha fica no código: se não definir,
+// o seed gera uma aleatória e mostra no terminal.
+function senhaDoSeed(valor: string | undefined, nome: string) {
+  if (valor) return valor;
+  const gerada = randomBytes(12).toString("base64url");
+  console.log(`${nome} não definida; senha gerada (vale só se o usuário ainda não existia): ${gerada}`);
+  return gerada;
+}
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? "admin@goncadasvendas.com";
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "troque-esta-senha";
+const ADMIN_PASSWORD = senhaDoSeed(process.env.SEED_ADMIN_PASSWORD, "SEED_ADMIN_PASSWORD");
 const ADMIN_NAME = process.env.SEED_ADMIN_NAME ?? "Admin";
 
 const CUSTOMER_EMAIL = process.env.SEED_CUSTOMER_EMAIL ?? "cliente@goncadasvendas.com";
-const CUSTOMER_PASSWORD = process.env.SEED_CUSTOMER_PASSWORD ?? "troque-esta-senha";
+const CUSTOMER_PASSWORD = senhaDoSeed(process.env.SEED_CUSTOMER_PASSWORD, "SEED_CUSTOMER_PASSWORD");
 
 const PRODUCTS = [
   { name: "Camiseta Básica", category: "Roupas", brand: "GV Basics", price: 49.9 },
@@ -58,12 +66,12 @@ async function main() {
 
   console.log(`Usuário CUSTOMER criado/atualizado: ${customer.email}`);
 
-  for (const product of PRODUCTS) {
-    const existing = await prisma.product.findFirst({ where: { name: product.name } });
-    if (!existing) {
-      await prisma.product.create({ data: product });
-    }
-  }
+  await Promise.all(
+    PRODUCTS.map(async (product) => {
+      const existing = await prisma.product.findFirst({ where: { name: product.name } });
+      if (!existing) await prisma.product.create({ data: product });
+    }),
+  );
 
   console.log(`${PRODUCTS.length} produtos criados/atualizados.`);
 }

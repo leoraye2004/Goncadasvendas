@@ -5,9 +5,9 @@ export const metadata: Metadata = { title: "Entrar" };
 
 export default async function LoginPage({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: Promise<{ cadastro?: string }>;
-}) {
+}>) {
   const { cadastro } = await searchParams;
 
   return (
