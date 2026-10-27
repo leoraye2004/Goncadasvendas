@@ -7,7 +7,8 @@ Plataforma web de gestão de vendas para pequenos comércios. Projeto de Portfó
 
 Loja online simples: o cliente se cadastra, navega pelo catálogo, monta o carrinho, cadastra
 um endereço e finaliza o pedido. O admin cadastra produtos (com imagens) e acompanha os pedidos.
-O escopo completo (casos de uso e regras de negócio) está descrito em `CLAUDE.md`.
+O escopo completo (casos de uso, requisitos e regras de negócio) está na [Wiki](https://github.com/leoraye2004/Goncadasvendas/wiki)
+e na RFC em `docs/`.
 
 ## Stack
 
@@ -23,11 +24,11 @@ O escopo completo (casos de uso e regras de negócio) está descrito em `CLAUDE.
 
 ## Como rodar localmente
 
-Pré-requisitos: Node 20+, Docker.
+Pré-requisitos: Node 22 (o mesmo do CI) e Docker.
 
 1. Subir um Postgres local:
    ```bash
-   docker run -e POSTGRES_PASSWORD=dev -p 5432:5432 postgres:16
+   docker run -d --name gv-postgres -e POSTGRES_PASSWORD=dev -p 5432:5432 postgres:16
    ```
 2. Criar um `.env` na raiz com:
    ```bash
@@ -76,7 +77,15 @@ docker run -p 3000:3000 --add-host=host.docker.internal:host-gateway \
 - `GET /api/health` mostra o estado do app e do banco: **200** quando está tudo de pé, **503** quando o banco não responde.
 - `APPLICATIONINSIGHTS_CONNECTION_STRING` (opcional) liga o monitoramento no Application Insights. Sem ela, o app roda normalmente.
 
+## CI/CD e deploy
+
+Todo PR roda lint, testes, SonarCloud e o build da imagem Docker. A `main` é protegida: só recebe merge com PR e CI verde.
+A cada merge na `main`, o GitHub Actions publica a imagem no GHCR e faz o deploy no Azure Container Apps
+(login por OIDC, sem senha guardada), conferindo `/api/health` no fim. A infraestrutura está em `infra/` (Terraform);
+o passo a passo está em [`infra/README.md`](infra/README.md).
+
 ## Links
 
-- Wiki (requisitos, user stories, arquitetura, decisões): em construção — issue de documentação da Semana 1.
-- Deploy em produção: em construção — issues de infraestrutura e CI/CD da Semana 1.
+- [Wiki](https://github.com/leoraye2004/Goncadasvendas/wiki): requisitos, user stories, arquitetura, deploy, testes e decisões.
+- [Aplicação em produção](https://ca-goncadasvendas.wittybeach-f7ea4300.brazilsouth.azurecontainerapps.io) (a primeira visita pode demorar alguns segundos: o app dorme sem tráfego).
+- [Qualidade no SonarCloud](https://sonarcloud.io/project/overview?id=leoraye2004_Goncadasvendas).
