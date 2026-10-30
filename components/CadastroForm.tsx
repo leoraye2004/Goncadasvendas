@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type SubmitEvent } from "react";
 import FormError from "@/components/FormError";
 
-const campo = "mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500";
+const campo = "form-control";
 
 // UC01 — cadastro. As regras ficam no servidor (auth-service); aqui só enviamos e mostramos o erro.
 export default function CadastroForm() {
@@ -38,39 +38,39 @@ export default function CadastroForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
+    <form onSubmit={handleSubmit} className="panel w-full max-w-sm space-y-4 p-6">
       <h1 className="text-2xl font-semibold">Criar conta</h1>
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium">
+        <label htmlFor="name" className="form-label">
           Nome completo
         </label>
         <input id="name" name="name" autoComplete="name" required className={campo} />
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium">
+        <label htmlFor="email" className="form-label">
           E-mail
         </label>
         <input id="email" name="email" type="email" autoComplete="email" required className={campo} />
       </div>
 
       <div>
-        <label htmlFor="cpf" className="block text-sm font-medium">
+        <label htmlFor="cpf" className="form-label">
           CPF
         </label>
         <input id="cpf" name="cpf" inputMode="numeric" placeholder="000.000.000-00" required className={campo} />
       </div>
 
       <div>
-        <label htmlFor="birthDate" className="block text-sm font-medium">
+        <label htmlFor="birthDate" className="form-label">
           Data de nascimento
         </label>
         <input id="birthDate" name="birthDate" type="date" autoComplete="bday" required className={campo} />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium">
+        <label htmlFor="password" className="form-label">
           Senha
         </label>
         <input
@@ -94,14 +94,14 @@ export default function CadastroForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
+        className="btn btn-primary w-full"
       >
         {loading ? "Cadastrando..." : "Criar conta"}
       </button>
 
-      <p className="text-center text-sm text-neutral-600">
+      <p className="text-center text-sm text-muted">
         Já tem conta?{" "}
-        <Link href="/login" className="font-medium underline">
+        <Link href="/login" className="font-medium text-brand hover:underline">
           Entrar
         </Link>
       </p>

@@ -6,7 +6,7 @@ import { signIn } from "next-auth/react";
 import { useState, type SubmitEvent } from "react";
 import FormError from "@/components/FormError";
 
-const campo = "mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500";
+const campo = "form-control";
 
 // UC02 — login. A mensagem de erro é sempre a mesma, para não revelar se o e-mail existe.
 export default function LoginForm({ justRegistered = false }: Readonly<{ justRegistered?: boolean }>) {
@@ -39,24 +39,24 @@ export default function LoginForm({ justRegistered = false }: Readonly<{ justReg
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
+    <form onSubmit={handleSubmit} className="panel w-full max-w-sm space-y-4 p-6">
       <h1 className="text-2xl font-semibold">Entrar</h1>
 
       {justRegistered && (
-        <output className="block rounded-md bg-green-50 px-3 py-2 text-sm text-green-800">
+        <output className="form-success block">
           Cadastro concluído! Entre com seu e-mail e senha.
         </output>
       )}
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium">
+        <label htmlFor="email" className="form-label">
           E-mail
         </label>
         <input id="email" name="email" type="email" autoComplete="email" required className={campo} />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium">
+        <label htmlFor="password" className="form-label">
           Senha
         </label>
         <input id="password" name="password" type="password" autoComplete="current-password" required className={campo} />
@@ -67,14 +67,14 @@ export default function LoginForm({ justRegistered = false }: Readonly<{ justReg
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
+        className="btn btn-primary w-full"
       >
         {loading ? "Entrando..." : "Entrar"}
       </button>
 
-      <p className="text-center text-sm text-neutral-600">
+      <p className="text-center text-sm text-muted">
         Ainda não tem conta?{" "}
-        <Link href="/cadastro" className="font-medium underline">
+        <Link href="/cadastro" className="font-medium text-brand hover:underline">
           Cadastre-se
         </Link>
       </p>

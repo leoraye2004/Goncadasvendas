@@ -18,6 +18,7 @@ export async function authorizeCredentials(
 export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
+    maxAge: 60 * 60 * 24 * 7, // 7 dias; depois disso é preciso entrar de novo (o padrão do NextAuth seria 30)
   },
   pages: {
     signIn: "/login",
