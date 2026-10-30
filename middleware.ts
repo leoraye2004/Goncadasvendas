@@ -23,5 +23,13 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/admin/:path*", "/minha-conta/:path*", "/checkout/:path*"],
+  // RN01 (só logado): carrinho, favoritos, endereços, pedidos e conta. RN05: /admin (a checagem do papel está acima).
+  matcher: [
+    "/admin/:path*",
+    "/carrinho/:path*",
+    "/favoritos/:path*",
+    "/enderecos/:path*",
+    "/pedidos/:path*",
+    "/conta/:path*",
+  ],
 };
