@@ -13,7 +13,7 @@ type Failure = {
 };
 export type Result<T> = { ok: true; data: T } | Failure;
 
-const TIPOS = ["image/jpeg", "image/png", "image/webp"];
+const TIPOS = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_BYTES = 5 * 1024 * 1024;
 const MAX_IMAGENS = 6; // RF11: várias imagens por produto
 
@@ -24,7 +24,7 @@ const NAO_ENCONTRADO = falha("NOT_FOUND", "Produto não encontrado");
 function erroDeImagem(novas: UploadFile[], jaExistem: number): Failure | null {
   if (jaExistem + novas.length > MAX_IMAGENS) return falha("INVALID_IMAGE", `Cada produto aceita no máximo ${MAX_IMAGENS} imagens`);
   for (const arquivo of novas) {
-    if (!TIPOS.includes(arquivo.type)) return falha("INVALID_IMAGE", "Envie imagens JPG, PNG ou WebP");
+    if (!TIPOS.has(arquivo.type)) return falha("INVALID_IMAGE", "Envie imagens JPG, PNG ou WebP");
     if (arquivo.size > MAX_BYTES) return falha("INVALID_IMAGE", "Cada imagem pode ter no máximo 5 MB");
   }
   return null;

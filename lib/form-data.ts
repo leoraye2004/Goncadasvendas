@@ -2,7 +2,10 @@ import type { UploadFile } from "@/services/product-service";
 
 // Campos de texto do formulário de produto, do jeito que o service espera.
 export function productFields(form: FormData) {
-  const texto = (nome: string) => String(form.get(nome) ?? "");
+  const texto = (nome: string) => {
+    const valor = form.get(nome);
+    return typeof valor === "string" ? valor : "";
+  };
   return { name: texto("name"), category: texto("category"), brand: texto("brand"), price: texto("price") };
 }
 

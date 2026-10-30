@@ -15,11 +15,15 @@ export type ProductFormValues = {
 
 const CATEGORIAS = ["Roupas", "Calçados", "Acessórios"];
 
+const textoDoBotao = (product?: ProductFormValues) => (product ? "Salvar alterações" : "Cadastrar produto");
+
 // UC03 — cadastro e edição de produto (com várias imagens). As regras ficam no servidor (product-service).
 export default function ProductForm({ product }: Readonly<{ product?: ProductFormValues }>) {
   const router = useRouter();
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
+
+  const rotuloDoBotao = loading ? "Salvando..." : textoDoBotao(product);
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -80,8 +84,8 @@ export default function ProductForm({ product }: Readonly<{ product?: ProductFor
               <label key={imagem.id} className="block w-24 text-center text-xs">
                 {/* eslint-disable-next-line @next/next/no-img-element -- as imagens vêm do Blob (domínio externo) */}
                 <img src={imagem.url} alt="" className="h-24 w-24 rounded-lg border border-line object-cover" />
-                <input type="checkbox" name="removeImageIds" value={imagem.id} className="mr-1 mt-1" />
-                Remover
+                <input type="checkbox" name="removeImageIds" value={imagem.id} className="mt-1" />
+                <span className="ml-1">Remover</span>
               </label>
             ))}
           </div>
@@ -97,7 +101,7 @@ export default function ProductForm({ product }: Readonly<{ product?: ProductFor
 
       <div className="flex gap-2">
         <button type="submit" disabled={loading} className="btn btn-primary">
-          {loading ? "Salvando..." : product ? "Salvar alterações" : "Cadastrar produto"}
+          {rotuloDoBotao}
         </button>
         <button type="button" onClick={() => router.push("/admin/produtos")} className="btn btn-secondary">
           Cancelar

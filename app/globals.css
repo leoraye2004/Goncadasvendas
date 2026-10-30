@@ -37,8 +37,14 @@
   }
 
   html {
-    scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+  }
+
+  /* Rolagem suave só para quem não pediu menos movimento no sistema */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   body {
@@ -54,16 +60,6 @@
   :focus-visible {
     outline: 2px solid var(--color-brand);
     outline-offset: 2px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
   }
 }
 
@@ -91,7 +87,7 @@
   }
 
   .btn {
-    @apply inline-block cursor-pointer select-none rounded-lg border border-transparent px-4 py-2 text-center text-base font-medium transition duration-150 active:scale-[.98] disabled:pointer-events-none disabled:opacity-60;
+    @apply inline-block cursor-pointer select-none rounded-lg border border-transparent px-4 py-2 text-center text-base font-medium transition duration-150 active:scale-[.98] disabled:pointer-events-none disabled:opacity-60 motion-reduce:transition-none motion-reduce:active:scale-100;
   }
   .btn-primary {
     @apply border-brand bg-brand text-white shadow-bs-sm hover:border-brand-dark hover:bg-brand-dark;
