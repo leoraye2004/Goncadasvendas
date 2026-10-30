@@ -44,7 +44,13 @@ Pré-requisitos: Node 22 (o mesmo do CI) e Docker.
    ```
    As senhas do admin e do cliente de exemplo vêm de `SEED_ADMIN_PASSWORD` e `SEED_CUSTOMER_PASSWORD`;
    se não definir, o seed gera senhas aleatórias e mostra no terminal.
-4. Rodar o projeto:
+4. (Opcional) Para enviar imagens de produtos localmente, suba o emulador do Azure Blob:
+   ```bash
+   docker run -d --name gv-azurite -p 10000:10000 mcr.microsoft.com/azure-storage/azurite azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck
+   ```
+   No `.env`: `AZURE_STORAGE_CONNECTION_STRING="UseDevelopmentStorage=true"`. O container `product-images` precisa existir
+   (em produção ele vem do Terraform). Sem essa variável o app roda normalmente; só o envio de imagem avisa que não está configurado.
+5. Rodar o projeto:
    ```bash
    npm run dev
    ```

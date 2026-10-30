@@ -1,26 +1,135 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Visual do site original (cores, fontes e tamanhos do Bootstrap 5), portado para o Tailwind 4. */
+@theme {
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1400px;
+
+  --color-brand: #0d6efd;
+  --color-brand-dark: #0a58ca;
+  --color-brand-accent: #d4af37;
+  --color-success: #198754;
+  --color-success-dark: #157347;
+  --color-danger: #dc3545;
+  --color-danger-dark: #bb2d3b;
+  --color-header: #121212;
+  --color-light: #f8f9fa;
+  --color-line: #dee2e6;
+  --color-muted: #6c757d;
+  --color-ink: #212529;
+  --color-background: #f7f8fa;
+  --color-foreground: #212529;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
+
+  --shadow-bs: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --shadow-bs-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-line);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background font-sans text-base text-ink antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply tracking-tight;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Contêiner com larguras fixas por breakpoint e 12px de respiro nas laterais */
+  .bs-container {
+    @apply mx-auto w-full px-3 sm:max-w-[540px] md:max-w-[720px] lg:max-w-[960px] xl:max-w-[1140px] 2xl:max-w-[1320px];
+  }
+
+  .form-control {
+    @apply block w-full rounded-lg border border-[#ced4da] bg-white px-3 py-2 text-base text-ink outline-none transition placeholder:text-muted/70;
+  }
+  .form-control:focus {
+    @apply border-[#86b7fe];
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.2);
+  }
+  .form-label {
+    @apply mb-1.5 block text-sm font-medium text-ink;
+  }
+  .form-error {
+    @apply mb-3 rounded-lg border border-[#f1aeb5] bg-[#f8d7da] px-4 py-3 text-sm text-[#842029];
+  }
+  .form-success {
+    @apply mb-3 rounded-lg border border-[#a3cfbb] bg-[#d1e7dd] px-4 py-3 text-sm text-[#0f5132];
+  }
+
+  .btn {
+    @apply inline-block cursor-pointer select-none rounded-lg border border-transparent px-4 py-2 text-center text-base font-medium transition duration-150 active:scale-[.98] disabled:pointer-events-none disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply border-brand bg-brand text-white shadow-bs-sm hover:border-brand-dark hover:bg-brand-dark;
+  }
+  .btn-secondary {
+    @apply border-muted bg-muted text-white shadow-bs-sm hover:bg-[#5c636a];
+  }
+  .btn-danger {
+    @apply border-danger bg-danger text-white shadow-bs-sm hover:border-danger-dark hover:bg-danger-dark;
+  }
+  .btn-outline-primary {
+    @apply border-brand bg-transparent text-brand hover:bg-brand hover:text-white;
+  }
+  .btn-outline-danger {
+    @apply border-danger bg-transparent text-danger hover:bg-danger hover:text-white;
+  }
+  .btn-sm {
+    @apply px-3 py-1 text-sm;
+  }
+  .btn-lg {
+    @apply rounded-xl px-5 py-3 text-lg;
+  }
+
+  /* Painel grande (listas e formulários do admin, carrinho, conta...) */
+  .panel {
+    @apply overflow-hidden rounded-2xl border border-line bg-white shadow-bs-sm;
+  }
+
+  .bs-table {
+    @apply w-full text-left text-sm;
+  }
+  .bs-table th {
+    @apply border-b-2 border-line px-3 py-2.5 font-semibold text-muted;
+  }
+  .bs-table td {
+    @apply border-b border-line px-3 py-3 align-middle;
+  }
+  .bs-table tbody tr:hover {
+    @apply bg-light;
+  }
 }
