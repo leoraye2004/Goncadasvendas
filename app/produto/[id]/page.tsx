@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import AddToCartButton from "@/components/AddToCartButton";
 import ProductGallery from "@/components/ProductGallery";
 import { catalogService } from "@/lib/catalog";
 import { formatBRL } from "@/lib/format";
+import { currentActor } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProdutoPage({ params }: Props) {
   const produto = await catalogService.detail((await params).id);
   if (!produto) notFound();
+  const loggedIn = (await currentActor()) !== null;
 
   return (
     <main className="bs-container py-8">
@@ -49,6 +52,9 @@ export default async function ProdutoPage({ params }: Props) {
           <h1 className="mt-1 text-[1.75rem] font-bold leading-tight">{produto.name}</h1>
           <p className="mt-1 text-sm text-muted">{produto.category}</p>
           <p className="mt-4 text-[2rem] font-bold leading-none">{formatBRL(produto.price)}</p>
+          <div className="mt-6">
+            <AddToCartButton productId={produto.id} loggedIn={loggedIn} />
+          </div>
         </div>
       </div>
     </main>

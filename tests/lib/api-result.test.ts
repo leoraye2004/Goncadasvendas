@@ -4,6 +4,7 @@ import { formatBRL } from "@/lib/format";
 
 describe("failureResponse", () => {
   it.each([
+    ["UNAUTHENTICATED", 401],
     ["FORBIDDEN", 403],
     ["INVALID", 400],
     ["INVALID_IMAGE", 400],

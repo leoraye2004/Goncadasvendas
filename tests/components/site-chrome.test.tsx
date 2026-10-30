@@ -34,6 +34,28 @@ describe("SiteHeader", () => {
     expect(screen.getByRole("link", { name: "Administração" }).getAttribute("href")).toBe("/admin");
   });
 
+  it("logado vê o link do carrinho com a quantidade de itens", () => {
+    render(<SiteHeader user={{ name: "Ana", isAdmin: false }} cartCount={3} />);
+
+    const carrinho = screen.getByRole("link", { name: "Carrinho, 3 itens" });
+    expect(carrinho.getAttribute("href")).toBe("/carrinho");
+    expect(carrinho.textContent).toContain("3");
+  });
+
+  it("com 1 item o rótulo fica no singular e sem itens mostra 0", () => {
+    const { rerender } = render(<SiteHeader user={{ name: "Ana", isAdmin: false }} cartCount={1} />);
+    expect(screen.getByRole("link", { name: "Carrinho, 1 item" })).toBeTruthy();
+
+    rerender(<SiteHeader user={{ name: "Ana", isAdmin: false }} />);
+    expect(screen.getByRole("link", { name: "Carrinho, 0 itens" })).toBeTruthy();
+  });
+
+  it("visitante não vê o carrinho (RN01)", () => {
+    render(<SiteHeader user={null} />);
+
+    expect(screen.queryByRole("link", { name: /Carrinho/ })).toBeNull();
+  });
+
   it("a marca leva para a home", () => {
     render(<SiteHeader user={null} />);
 
