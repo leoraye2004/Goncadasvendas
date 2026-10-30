@@ -5,6 +5,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch: # permite rodar à mão (aba Actions → Run workflow); na main também publica e faz deploy
 
 permissions:
   contents: read
@@ -66,7 +67,7 @@ jobs:
       packages: write # permite ao GITHUB_TOKEN publicar o pacote no GHCR
     env:
       IMAGEM: ghcr.io/leoraye2004/goncadasvendas
-      PUBLICAR: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+      PUBLICAR: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     steps:
       - uses: actions/checkout@v7
 
@@ -97,7 +98,7 @@ jobs:
   deploy:
     name: Deploy no Azure
     needs: imagem
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
