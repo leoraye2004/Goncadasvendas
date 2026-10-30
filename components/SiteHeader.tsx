@@ -4,8 +4,9 @@ import type { HeaderUser } from "@/lib/session";
 
 const link = "rounded-full px-3 py-2 text-sm text-white/90 transition hover:bg-white/10 hover:text-white md:px-4";
 
-// Cabeçalho do site: marca à esquerda; à direita, Entrar e Cadastrar (visitante) ou nome, Administração e Sair.
-export default function SiteHeader({ user }: Readonly<{ user: HeaderUser | null }>) {
+// Cabeçalho do site: marca à esquerda; à direita, Entrar e Cadastrar (visitante) ou nome, Carrinho (com a
+// quantidade de itens), Administração e Sair.
+export default function SiteHeader({ user, cartCount = 0 }: Readonly<{ user: HeaderUser | null; cartCount?: number }>) {
   return (
     <header className="sticky top-0 z-40 bg-header text-white shadow-bs-sm">
       <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-3 px-4 py-3">
@@ -25,6 +26,10 @@ export default function SiteHeader({ user }: Readonly<{ user: HeaderUser | null 
                   Administração
                 </Link>
               )}
+              <Link href="/carrinho" className={link} aria-label={`Carrinho, ${cartCount} ${cartCount === 1 ? "item" : "itens"}`}>
+                Carrinho
+                <span className="ml-1.5 rounded-full bg-brand px-2 py-0.5 text-xs font-semibold text-white">{cartCount}</span>
+              </Link>
               <LogoutButton />
             </>
           ) : (
