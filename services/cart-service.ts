@@ -2,15 +2,10 @@ import { MAX_QUANTITY, quantitySchema } from "@/lib/validation/cart";
 import type { CartRepository } from "@/repositories/cart-repository";
 import type { ProductRepository } from "@/repositories/product-repository";
 import type { Actor } from "@/services/product-service";
+import { falha, OK, SEM_LOGIN, type Result } from "@/services/result";
 
-type Failure = { ok: false; code: "UNAUTHENTICATED" | "INVALID" | "NOT_FOUND"; message: string };
-type Result<T> = { ok: true; data: T } | Failure;
-
-const falha = (code: Failure["code"], message: string): Failure => ({ ok: false, code, message });
-const SEM_LOGIN = falha("UNAUTHENTICATED", "Faça login para usar o carrinho");
 const PRODUTO_NAO_ENCONTRADO = falha("NOT_FOUND", "Produto não encontrado");
 const ITEM_NAO_ENCONTRADO = falha("NOT_FOUND", "Item não encontrado no carrinho");
-const OK = { ok: true, data: undefined } as const;
 
 type Produto = { price: unknown; active: boolean };
 // RN03: produto inativo ou sem preço não pode ser comprado.
