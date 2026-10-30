@@ -11,7 +11,7 @@ vi.mock("next-auth", () => ({ getServerSession }));
 vi.mock("next/navigation", () => ({ redirect }));
 vi.mock("@/lib/auth", () => ({ authOptions: {} }));
 
-import { currentActor, requireAdmin } from "@/lib/session";
+import { currentActor, currentUser, requireAdmin } from "@/lib/session";
 
 beforeEach(() => vi.clearAllMocks());
 
@@ -26,6 +26,26 @@ describe("currentActor", () => {
     getServerSession.mockResolvedValue(null);
 
     expect(await currentActor()).toBeNull();
+  });
+});
+
+describe("currentUser", () => {
+  it("devolve o nome e se é admin", async () => {
+    getServerSession.mockResolvedValue({ user: { id: "u1", role: "ADMIN", name: "Ana" } });
+
+    expect(await currentUser()).toEqual({ name: "Ana", isAdmin: true });
+  });
+
+  it("cliente comum não é admin e nome ausente vira texto vazio", async () => {
+    getServerSession.mockResolvedValue({ user: { id: "u2", role: "CUSTOMER" } });
+
+    expect(await currentUser()).toEqual({ name: "", isAdmin: false });
+  });
+
+  it("devolve null sem login", async () => {
+    getServerSession.mockResolvedValue(null);
+
+    expect(await currentUser()).toBeNull();
   });
 });
 
