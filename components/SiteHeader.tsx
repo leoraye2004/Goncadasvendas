@@ -26,6 +26,9 @@ export default function SiteHeader({ user, cartCount = 0 }: Readonly<{ user: Hea
                   Administração
                 </Link>
               )}
+              <Link href="/enderecos" className={link}>
+                Endereços
+              </Link>
               <Link href="/carrinho" className={link} aria-label={`Carrinho, ${cartCount} ${cartCount === 1 ? "item" : "itens"}`}>
                 Carrinho
                 <span className="ml-1.5 rounded-full bg-brand px-2 py-0.5 text-xs font-semibold text-white">{cartCount}</span>

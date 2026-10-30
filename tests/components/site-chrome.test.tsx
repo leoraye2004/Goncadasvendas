@@ -34,6 +34,15 @@ describe("SiteHeader", () => {
     expect(screen.getByRole("link", { name: "Administração" }).getAttribute("href")).toBe("/admin");
   });
 
+  it("logado vê o link dos endereços; visitante não", () => {
+    const { unmount } = render(<SiteHeader user={{ name: "Ana", isAdmin: false }} />);
+    expect(screen.getByRole("link", { name: "Endereços" }).getAttribute("href")).toBe("/enderecos");
+    unmount();
+
+    render(<SiteHeader user={null} />);
+    expect(screen.queryByRole("link", { name: "Endereços" })).toBeNull();
+  });
+
   it("logado vê o link do carrinho com a quantidade de itens", () => {
     render(<SiteHeader user={{ name: "Ana", isAdmin: false }} cartCount={3} />);
 
