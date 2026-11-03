@@ -61,6 +61,9 @@ export default async function CarrinhoPage() {
                 <dd className="text-2xl font-bold">{formatBRL(total)}</dd>
               </div>
             </dl>
+            <Link href="/checkout" className="btn btn-success btn-lg mt-5 w-full">
+              Finalizar pedido
+            </Link>
           </aside>
         </div>
       )}

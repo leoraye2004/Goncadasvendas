@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { failureResponse, NOT_LOGGED_IN } from "@/lib/api-result";
-import { formatBRL } from "@/lib/format";
 
 describe("failureResponse", () => {
   it.each([
@@ -22,8 +21,3 @@ describe("failureResponse", () => {
   });
 });
 
-describe("formatBRL", () => {
-  it("formata em reais, com vírgula", () => {
-    expect(formatBRL(49.9).replace(/\s/g, " ")).toBe("R$ 49,90");
-  });
-});

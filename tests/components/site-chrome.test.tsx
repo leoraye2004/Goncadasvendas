@@ -34,6 +34,12 @@ describe("SiteHeader", () => {
     expect(screen.getByRole("link", { name: "Administração" }).getAttribute("href")).toBe("/admin");
   });
 
+  it("logado vê o link dos pedidos", () => {
+    render(<SiteHeader user={{ name: "Ana", isAdmin: false }} />);
+
+    expect(screen.getByRole("link", { name: "Pedidos" }).getAttribute("href")).toBe("/pedidos");
+  });
+
   it("logado vê o link dos endereços; visitante não", () => {
     const { unmount } = render(<SiteHeader user={{ name: "Ana", isAdmin: false }} />);
     expect(screen.getByRole("link", { name: "Endereços" }).getAttribute("href")).toBe("/enderecos");
