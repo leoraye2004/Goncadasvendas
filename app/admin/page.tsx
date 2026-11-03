@@ -16,6 +16,10 @@ export default function AdminHome() {
           <h2 className="text-lg font-semibold">Usuários</h2>
           <p className="mt-1 text-sm text-muted">Veja quem tem conta, mude o papel ou exclua usuários.</p>
         </Link>
+        <Link href="/admin/pedidos" className="panel block p-5 transition hover:shadow-bs">
+          <h2 className="text-lg font-semibold">Pedidos</h2>
+          <p className="mt-1 text-sm text-muted">Acompanhe os pedidos de todos os clientes e atualize o status.</p>
+        </Link>
       </div>
     </section>
   );

@@ -90,3 +90,41 @@ describe("orderRepository — leitura", () => {
     });
   });
 });
+
+describe("orderRepository — administração (UC10)", () => {
+  it("listAll traz os pedidos de todos, do mais novo para o mais antigo, com cliente e contagem de itens", async () => {
+    const { db, repo } = setup(0);
+
+    await repo.listAll();
+
+    expect(db.order.findMany).toHaveBeenCalledWith({
+      orderBy: { createdAt: "desc" },
+      include: { user: { select: { name: true, email: true } }, _count: { select: { items: true } } },
+    });
+  });
+
+  it("findById traz o pedido com cliente, itens e nome dos produtos", async () => {
+    const { db, repo } = setup(0);
+
+    await repo.findById("o1");
+
+    expect(db.order.findUnique).toHaveBeenCalledWith({
+      where: { id: "o1" },
+      include: {
+        user: { select: { name: true, email: true } },
+        items: { include: { product: { select: { name: true } } }, orderBy: { id: "asc" } },
+      },
+    });
+  });
+
+  it("setStatus só muda se o pedido ainda está no status de origem e devolve quantos mudou", async () => {
+    const { db, repo } = setup(0);
+    db.order.updateMany.mockResolvedValue({ count: 1 });
+
+    expect(await repo.setStatus("o1", "PENDING", "CONFIRMED")).toBe(1);
+    expect(db.order.updateMany).toHaveBeenCalledWith({
+      where: { id: "o1", status: "PENDING" },
+      data: { status: "CONFIRMED" },
+    });
+  });
+});
