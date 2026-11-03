@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type SubmitEvent } from "react";
-import { cartRequest } from "@/components/cart-request";
+import { apiRequest } from "@/components/api-request";
 import FormError from "@/components/FormError";
 
 // UC05 — botão da página do produto. Visitante é convidado a entrar (RN01); logado escolhe a quantidade.
@@ -27,7 +27,7 @@ export default function AddToCartButton({ productId, loggedIn }: Readonly<{ prod
     setError(undefined);
     setAdded(false);
     setLoading(true);
-    const erro = await cartRequest("/api/carrinho", "POST", { productId, quantity });
+    const erro = await apiRequest("/api/carrinho", "POST", { productId, quantity });
     setLoading(false);
     if (erro) return setError(erro);
     setAdded(true);

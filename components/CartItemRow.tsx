@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { cartRequest } from "@/components/cart-request";
+import { apiRequest } from "@/components/api-request";
 import FormError from "@/components/FormError";
 import { formatBRL } from "@/lib/format";
 
@@ -25,7 +25,7 @@ export default function CartItemRow({ item }: Readonly<{ item: CartLine }>) {
 
   async function enviar(method: "PATCH" | "DELETE") {
     setError(undefined);
-    const erro = await cartRequest(`/api/carrinho/${item.id}`, method, method === "PATCH" ? { quantity } : undefined);
+    const erro = await apiRequest(`/api/carrinho/${item.id}`, method, method === "PATCH" ? { quantity } : undefined);
     if (erro) return setError(erro);
     router.refresh();
   }
