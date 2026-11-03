@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import AddToCartButton from "@/components/AddToCartButton";
+import FavoriteButton from "@/components/FavoriteButton";
 import ProductGallery from "@/components/ProductGallery";
 import { catalogService } from "@/lib/catalog";
+import { favoriteService } from "@/lib/favorites";
 import { formatBRL } from "@/lib/format";
 import { currentActor } from "@/lib/session";
 
@@ -20,7 +22,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProdutoPage({ params }: Props) {
   const produto = await catalogService.detail((await params).id);
   if (!produto) notFound();
-  const loggedIn = (await currentActor()) !== null;
+  const actor = await currentActor();
+  const favorito = await favoriteService.isFavorite(actor, produto.id);
 
   return (
     <main className="bs-container py-8">
@@ -53,7 +56,10 @@ export default async function ProdutoPage({ params }: Props) {
           <p className="mt-1 text-sm text-muted">{produto.category}</p>
           <p className="mt-4 text-[2rem] font-bold leading-none">{formatBRL(produto.price)}</p>
           <div className="mt-6">
-            <AddToCartButton productId={produto.id} loggedIn={loggedIn} />
+            <AddToCartButton productId={produto.id} loggedIn={actor !== null} />
+          </div>
+          <div className="mt-4">
+            <FavoriteButton productId={produto.id} loggedIn={actor !== null} favorite={favorito} />
           </div>
         </div>
       </div>

@@ -29,6 +29,9 @@ export default function SiteHeader({ user, cartCount = 0 }: Readonly<{ user: Hea
               <Link href="/pedidos" className={link}>
                 Pedidos
               </Link>
+              <Link href="/favoritos" className={link}>
+                Favoritos
+              </Link>
               <Link href="/enderecos" className={link}>
                 Endereços
               </Link>
