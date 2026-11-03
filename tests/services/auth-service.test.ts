@@ -136,6 +136,28 @@ describe("authenticate", () => {
   });
 });
 
+describe("sessionUser (revalida a sessão a cada requisição)", () => {
+  it("devolve id, nome, e-mail e o papel ATUAL do banco", async () => {
+    repo.findById.mockResolvedValue(usuario({ role: "CUSTOMER" }));
+
+    expect(await createAuthService(repo).sessionUser("u1")).toEqual({
+      id: "u1",
+      name: "Ana Souza",
+      email: "ana@example.com",
+      role: "CUSTOMER",
+    });
+    expect(repo.findById).toHaveBeenCalledWith("u1");
+  });
+
+  it("usuário apagado (deletedAt) ou que não existe mais perde a sessão", async () => {
+    repo.findById.mockResolvedValueOnce(usuario({ deletedAt: new Date() }));
+    expect(await createAuthService(repo).sessionUser("u1")).toBeNull();
+
+    repo.findById.mockResolvedValueOnce(null);
+    expect(await createAuthService(repo).sessionUser("u1")).toBeNull();
+  });
+});
+
 describe("authenticate: tempo de resposta igual para e-mail inexistente", () => {
   // Se só os e-mails que existem gastassem tempo no bcrypt, daria para descobrir quem tem
   // cadastro medindo a resposta. Por isso o bcrypt roda SEMPRE, com hash do mesmo custo.
