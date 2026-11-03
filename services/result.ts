@@ -1,4 +1,4 @@
-export type Failure = { ok: false; code: "UNAUTHENTICATED" | "INVALID" | "NOT_FOUND"; message: string };
+export type Failure = { ok: false; code: "UNAUTHENTICATED" | "FORBIDDEN" | "INVALID" | "NOT_FOUND"; message: string };
 export type Result<T> = { ok: true; data: T } | Failure;
 
 export const falha = (code: Failure["code"], message: string): Failure => ({ ok: false, code, message });
