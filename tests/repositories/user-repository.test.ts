@@ -22,6 +22,14 @@ describe("userRepository", () => {
     expect(db.user.findUnique).toHaveBeenCalledWith({ where: { cpf: "52998224725" } });
   });
 
+  it("findById busca pelo id", async () => {
+    const db = mockDeep<PrismaClient>();
+
+    await createUserRepository(db).findById("u1");
+
+    expect(db.user.findUnique).toHaveBeenCalledWith({ where: { id: "u1" } });
+  });
+
   it("create grava os dados recebidos", async () => {
     const db = mockDeep<PrismaClient>();
     const novo = {
@@ -35,5 +43,38 @@ describe("userRepository", () => {
     await createUserRepository(db).create(novo);
 
     expect(db.user.create).toHaveBeenCalledWith({ data: novo });
+  });
+
+  it("listActive traz só os não apagados, com a contagem de pedidos e só os campos necessários", async () => {
+    const db = mockDeep<PrismaClient>();
+
+    await createUserRepository(db).listActive();
+
+    expect(db.user.findMany).toHaveBeenCalledWith({
+      where: { deletedAt: null },
+      select: { id: true, name: true, email: true, role: true, _count: { select: { orders: true } } },
+      orderBy: { name: "asc" },
+    });
+  });
+
+  it("setRole só muda usuário não apagado e devolve quantos mudou", async () => {
+    const db = mockDeep<PrismaClient>();
+    db.user.updateMany.mockResolvedValue({ count: 1 });
+
+    expect(await createUserRepository(db).setRole("u1", "ADMIN")).toBe(1);
+    expect(db.user.updateMany).toHaveBeenCalledWith({ where: { id: "u1", deletedAt: null }, data: { role: "ADMIN" } });
+  });
+
+  it("softDelete grava deletedAt (nunca apaga a linha, então os pedidos ficam)", async () => {
+    const db = mockDeep<PrismaClient>();
+    db.user.updateMany.mockResolvedValue({ count: 1 });
+
+    expect(await createUserRepository(db).softDelete("u1")).toBe(1);
+    expect(db.user.updateMany).toHaveBeenCalledWith({
+      where: { id: "u1", deletedAt: null },
+      data: { deletedAt: expect.any(Date) },
+    });
+    expect(db.user.delete).not.toHaveBeenCalled();
+    expect(db.user.deleteMany).not.toHaveBeenCalled();
   });
 });

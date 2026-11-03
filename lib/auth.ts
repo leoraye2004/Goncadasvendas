@@ -34,12 +34,15 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        return token;
       }
-      return token;
+      // Requisições seguintes: confere no banco. Apagado => id vazio, e lib/session.ts trata como sem login.
+      const atual = await authService.sessionUser(token.id);
+      return atual ? { ...token, role: atual.role } : { ...token, id: "" };
     },
     session({ session, token }) {
       if (session.user) {

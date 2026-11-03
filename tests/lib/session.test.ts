@@ -27,6 +27,13 @@ describe("currentActor", () => {
 
     expect(await currentActor()).toBeNull();
   });
+
+  it("sessão de usuário apagado (id vazio) não conta como login", async () => {
+    getServerSession.mockResolvedValue({ user: { id: "", role: "ADMIN" } });
+
+    expect(await currentActor()).toBeNull();
+    expect(await currentUser()).toBeNull();
+  });
 });
 
 describe("currentUser", () => {

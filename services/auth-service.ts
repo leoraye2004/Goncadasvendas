@@ -65,7 +65,14 @@ export function createAuthService(users: UserRepository) {
     return ativo && senhaCerta ? toSessionUser(ativo) : null;
   }
 
-  return { register, authenticate };
+  // Chamada a cada requisição com sessão: o papel vale o que está no banco AGORA, e quem foi apagado (RN04)
+  // ou rebaixado não continua com o acesso antigo até o token expirar.
+  async function sessionUser(id: string): Promise<SessionUser | null> {
+    const user = await users.findById(id);
+    return user && !user.deletedAt ? toSessionUser(user) : null;
+  }
+
+  return { register, authenticate, sessionUser };
 }
 
 export type AuthService = ReturnType<typeof createAuthService>;

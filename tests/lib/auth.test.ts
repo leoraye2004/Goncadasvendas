@@ -2,11 +2,15 @@ import type { Session, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { authenticate, register } = vi.hoisted(() => ({ authenticate: vi.fn(), register: vi.fn() }));
+const { authenticate, register, sessionUser } = vi.hoisted(() => ({
+  authenticate: vi.fn(),
+  register: vi.fn(),
+  sessionUser: vi.fn(),
+}));
 
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 vi.mock("@/services/auth-service", () => ({
-  createAuthService: () => ({ authenticate, register }),
+  createAuthService: () => ({ authenticate, register, sessionUser }),
 }));
 
 import { authOptions, authorizeCredentials, authService } from "@/lib/auth";
@@ -57,12 +61,27 @@ describe("authOptions", () => {
     expect(token).toMatchObject({ id: "u1", role: "ADMIN" });
   });
 
-  it("jwt não mexe no token nas requisições seguintes (sem usuário)", async () => {
-    const original = { id: "u1", role: "CUSTOMER" } as JWT;
+  it("jwt nas requisições seguintes atualiza o papel com o que está no banco (admin rebaixado perde o acesso)", async () => {
+    sessionUser.mockResolvedValue({ id: "u1", role: "CUSTOMER" });
 
-    const token = await authOptions.callbacks!.jwt!({ token: original } as never);
+    const token = await authOptions.callbacks!.jwt!({ token: { id: "u1", role: "ADMIN" } as JWT } as never);
 
-    expect(token).toEqual({ id: "u1", role: "CUSTOMER" });
+    expect(sessionUser).toHaveBeenCalledWith("u1");
+    expect(token).toMatchObject({ id: "u1", role: "CUSTOMER" });
+  });
+
+  it("jwt de usuário apagado esvazia o id, então a sessão deixa de valer (RN04)", async () => {
+    sessionUser.mockResolvedValue(null);
+
+    const token = await authOptions.callbacks!.jwt!({ token: { id: "u1", role: "ADMIN" } as JWT } as never);
+
+    expect(token).toMatchObject({ id: "" });
+  });
+
+  it("jwt no login não consulta o banco de novo", async () => {
+    await authOptions.callbacks!.jwt!({ token: {} as JWT, user: { id: "u1", role: "ADMIN" } as User } as never);
+
+    expect(sessionUser).not.toHaveBeenCalled();
   });
 
   it("session expõe id e role do token", async () => {
