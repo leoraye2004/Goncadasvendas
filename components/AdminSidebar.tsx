@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/admin", label: "Painel", exact: true },
   { href: "/admin/produtos", label: "Produtos" },
   { href: "/admin/usuarios", label: "Usuários" },
+  { href: "/admin/pedidos", label: "Pedidos" },
 ];
 
 export default function AdminSidebar() {

@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@prisma/client";
+import type { OrderStatus, PrismaClient } from "@prisma/client";
 
 export type NewOrder = {
   userId: string;
@@ -43,6 +43,27 @@ export function createOrderRepository(db: PrismaClient) {
         where: { id, userId },
         include: { items: { include: { product: { select: { name: true } } }, orderBy: { id: "asc" } } },
       }),
+
+    // Administração (UC10): enxerga os pedidos de TODOS. Só o admin-order-service chama estes três.
+    listAll: () =>
+      db.order.findMany({
+        orderBy: { createdAt: "desc" },
+        include: { user: { select: { name: true, email: true } }, _count: { select: { items: true } } },
+      }),
+
+    findById: (id: string) =>
+      db.order.findUnique({
+        where: { id },
+        include: {
+          user: { select: { name: true, email: true } },
+          items: { include: { product: { select: { name: true } } }, orderBy: { id: "asc" } },
+        },
+      }),
+
+    // Só muda se o pedido ainda está no status de origem (dois admins ao mesmo tempo não se atropelam).
+    // Devolve quantos pedidos mudou: 0 significa que outro admin mudou antes.
+    setStatus: async (id: string, de: OrderStatus, para: OrderStatus) =>
+      (await db.order.updateMany({ where: { id, status: de }, data: { status: para } })).count,
   };
 }
 
