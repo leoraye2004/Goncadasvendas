@@ -70,6 +70,14 @@ describe("authOptions", () => {
     expect(token).toMatchObject({ id: "u1", role: "CUSTOMER" });
   });
 
+  it("jwt também atualiza nome e e-mail, então o cabeçalho mostra o nome novo depois de editar o perfil", async () => {
+    sessionUser.mockResolvedValue({ id: "u1", role: "CUSTOMER", name: "Ana Souza", email: "nova@x.com" });
+
+    const token = await authOptions.callbacks!.jwt!({ token: { id: "u1", name: "Ana", email: "velha@x.com" } as JWT } as never);
+
+    expect(token).toMatchObject({ name: "Ana Souza", email: "nova@x.com" });
+  });
+
   it("jwt de usuário apagado esvazia o id, então a sessão deixa de valer (RN04)", async () => {
     sessionUser.mockResolvedValue(null);
 

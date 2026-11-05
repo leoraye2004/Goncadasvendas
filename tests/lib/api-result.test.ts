@@ -8,6 +8,7 @@ describe("failureResponse", () => {
     ["INVALID", 400],
     ["INVALID_IMAGE", 400],
     ["NOT_FOUND", 404],
+    ["CONFLICT", 409],
     ["STORAGE_ERROR", 502],
   ] as const)("%s vira HTTP %i com a mensagem no corpo", async (code, status) => {
     const resposta = failureResponse({ code, message: "algo" });

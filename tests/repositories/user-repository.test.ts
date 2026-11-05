@@ -78,3 +78,25 @@ describe("userRepository", () => {
     expect(db.user.deleteMany).not.toHaveBeenCalled();
   });
 });
+
+describe("userRepository — perfil", () => {
+  it("updateProfile muda nome, e-mail e nascimento só de usuário não apagado e devolve quantos mudou", async () => {
+    const db = mockDeep<PrismaClient>();
+    db.user.updateMany.mockResolvedValue({ count: 1 });
+    const dados = { name: "Ana", email: "ana@x.com", birthDate: new Date("1990-05-20T00:00:00Z") };
+
+    expect(await createUserRepository(db).updateProfile("u1", dados)).toBe(1);
+    expect(db.user.updateMany).toHaveBeenCalledWith({ where: { id: "u1", deletedAt: null }, data: dados });
+  });
+
+  it("setPasswordHash grava só o hash, de usuário não apagado", async () => {
+    const db = mockDeep<PrismaClient>();
+    db.user.updateMany.mockResolvedValue({ count: 1 });
+
+    expect(await createUserRepository(db).setPasswordHash("u1", "hash-novo")).toBe(1);
+    expect(db.user.updateMany).toHaveBeenCalledWith({
+      where: { id: "u1", deletedAt: null },
+      data: { passwordHash: "hash-novo" },
+    });
+  });
+});
