@@ -25,6 +25,13 @@ export function createUserRepository(db: PrismaClient) {
         orderBy: { name: "asc" },
       }),
 
+    // Perfil (RF10). O id vem da sessão, então o usuário só mexe nos próprios dados.
+    updateProfile: async (id: string, data: { name: string; email: string; birthDate: Date }) =>
+      (await db.user.updateMany({ where: { id, deletedAt: null }, data })).count,
+
+    setPasswordHash: async (id: string, passwordHash: string) =>
+      (await db.user.updateMany({ where: { id, deletedAt: null }, data: { passwordHash } })).count,
+
     // Devolvem quantos usuários mudaram: 0 significa que não existe ou já foi apagado.
     setRole: async (id: string, role: Role) =>
       (await db.user.updateMany({ where: { id, deletedAt: null }, data: { role } })).count,

@@ -154,8 +154,17 @@ describe("profileService.changePassword", () => {
     expect(users.setPasswordHash).not.toHaveBeenCalled();
   });
 
-  it("recusa corpo sem a senha atual", async () => {
-    expect(await service.changePassword(ana, { newPassword: "novaSenha99" })).toMatchObject({ ok: false, code: "INVALID" });
+  it("recusa corpo sem a senha atual ou sem a nova, com mensagem em português", async () => {
+    expect(await service.changePassword(ana, { newPassword: "novaSenha99" })).toMatchObject({
+      ok: false,
+      code: "INVALID",
+      message: "Informe a senha atual",
+    });
+    expect(await service.changePassword(ana, { currentPassword: "senhaAntiga1" })).toMatchObject({
+      ok: false,
+      code: "INVALID",
+      message: "Informe a senha",
+    });
     expect(await service.changePassword(ana, undefined)).toMatchObject({ ok: false, code: "INVALID" });
   });
 

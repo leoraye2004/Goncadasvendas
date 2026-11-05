@@ -30,6 +30,12 @@ function isValidBirthDate(valor: string): boolean {
   return data <= new Date() && data.getUTCFullYear() >= 1900;
 }
 
+// 72 é o limite do bcrypt: acima disso o hash ignora o resto da senha.
+export const passwordSchema = z
+  .string({ error: "Informe a senha" })
+  .min(8, "A senha deve ter pelo menos 8 caracteres")
+  .max(72, "A senha deve ter no máximo 72 caracteres");
+
 // UC01 — cadastro de usuário. O CPF fica só com dígitos e o e-mail em minúsculas.
 export const registerUserSchema = z.object({
   name: z.string().trim().min(1, "Informe o nome").max(100, "Nome muito longo"),
@@ -42,11 +48,16 @@ export const registerUserSchema = z.object({
     .string()
     .refine(isValidBirthDate, "Data de nascimento inválida")
     .transform((valor) => new Date(`${valor}T00:00:00Z`)),
-  // 72 é o limite do bcrypt: acima disso o hash ignora o resto da senha.
-  password: z
-    .string()
-    .min(8, "A senha deve ter pelo menos 8 caracteres")
-    .max(72, "A senha deve ter no máximo 72 caracteres"),
+  password: passwordSchema,
 });
 
 export type RegisterUserInput = z.infer<typeof registerUserSchema>;
+
+// RF10 — o que o usuário pode editar no próprio perfil. CPF não muda e o papel (role) nunca vem daqui:
+// o .pick() descarta qualquer outro campo que chegar no corpo.
+export const profileSchema = registerUserSchema.pick({ name: true, email: true, birthDate: true });
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string({ error: "Informe a senha atual" }).min(1, "Informe a senha atual"),
+  newPassword: passwordSchema,
+});

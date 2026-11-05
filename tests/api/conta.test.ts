@@ -32,11 +32,12 @@ describe("PUT /api/conta/perfil", () => {
     expect(update).toHaveBeenCalledWith(ana, corpo);
   });
 
-  it("sem login responde 401 e não chama o service", async () => {
+  it("sem login o service recusa e a rota responde 401", async () => {
     currentActor.mockResolvedValue(null);
+    update.mockResolvedValue({ ok: false, code: "UNAUTHENTICATED", message: "Faça login para continuar" });
 
     expect((await perfil(put({}))).status).toBe(401);
-    expect(update).not.toHaveBeenCalled();
+    expect(update).toHaveBeenCalledWith(null, {});
   });
 
   it("e-mail repetido vira 409 e dado inválido vira 400", async () => {
@@ -67,11 +68,12 @@ describe("PUT /api/conta/senha", () => {
     expect(changePassword).toHaveBeenCalledWith(ana, corpo);
   });
 
-  it("sem login responde 401", async () => {
+  it("sem login o service recusa e a rota responde 401", async () => {
     currentActor.mockResolvedValue(null);
+    changePassword.mockResolvedValue({ ok: false, code: "UNAUTHENTICATED", message: "Faça login para continuar" });
 
     expect((await senha(put({}))).status).toBe(401);
-    expect(changePassword).not.toHaveBeenCalled();
+    expect(changePassword).toHaveBeenCalledWith(null, {});
   });
 
   it("senha atual errada responde 400 com a mensagem", async () => {

@@ -4,7 +4,7 @@ import type { Role } from "@prisma/client";
 import { registerUserSchema } from "@/lib/validation/user";
 import type { UserRepository } from "@/repositories/user-repository";
 
-const CUSTO_BCRYPT = 10;
+export const CUSTO_BCRYPT = 10;
 
 // Hash de uma senha aleatória e descartável, com o MESMO custo (10) dos hashes reais. Quando o e-mail
 // não existe, comparamos a senha com ele só para gastar o mesmo tempo: sem isso, a resposta mais
