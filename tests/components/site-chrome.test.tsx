@@ -40,6 +40,15 @@ describe("SiteHeader", () => {
     expect(screen.getByRole("link", { name: "Pedidos" }).getAttribute("href")).toBe("/pedidos");
   });
 
+  it("logado vê o link da conta; visitante não", () => {
+    const { unmount } = render(<SiteHeader user={{ name: "Ana", isAdmin: false }} />);
+    expect(screen.getByRole("link", { name: "Minha conta" }).getAttribute("href")).toBe("/conta");
+    unmount();
+
+    render(<SiteHeader user={null} />);
+    expect(screen.queryByRole("link", { name: "Minha conta" })).toBeNull();
+  });
+
   it("logado vê o link dos favoritos; visitante não", () => {
     const { unmount } = render(<SiteHeader user={{ name: "Ana", isAdmin: false }} />);
     expect(screen.getByRole("link", { name: "Favoritos" }).getAttribute("href")).toBe("/favoritos");

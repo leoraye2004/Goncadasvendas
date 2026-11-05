@@ -42,7 +42,8 @@ export const authOptions: AuthOptions = {
       }
       // Requisições seguintes: confere no banco. Apagado => id vazio, e lib/session.ts trata como sem login.
       const atual = await authService.sessionUser(token.id);
-      return atual ? { ...token, role: atual.role } : { ...token, id: "" };
+      // Nome e e-mail também vêm do banco, para o cabeçalho mostrar o nome novo logo depois de editar o perfil.
+      return atual ? { ...token, role: atual.role, name: atual.name, email: atual.email } : { ...token, id: "" };
     },
     session({ session, token }) {
       if (session.user) {
