@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Footer from "@/components/Footer";
 import SiteHeader from "@/components/SiteHeader";
+import { ToastProvider } from "@/components/ToastProvider";
 import { cartService } from "@/lib/cart";
 import { currentActor, currentUser } from "@/lib/session";
 import "./globals.css";
@@ -17,9 +18,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className="h-full antialiased">
       <body className="flex min-h-full flex-col">
-        <SiteHeader user={user} cartCount={cartCount} />
-        <div className="flex flex-1 flex-col">{children}</div>
-        <Footer />
+        <ToastProvider>
+          <SiteHeader user={user} cartCount={cartCount} />
+          <div className="flex flex-1 flex-col">{children}</div>
+          <Footer />
+        </ToastProvider>
       </body>
     </html>
   );
