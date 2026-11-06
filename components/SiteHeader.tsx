@@ -10,8 +10,12 @@ export default function SiteHeader({ user, cartCount = 0 }: Readonly<{ user: Hea
   return (
     <header className="sticky top-0 z-40 bg-header text-white shadow-bs-sm">
       <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="text-xl font-bold tracking-tight">
-          Goncadas<span className="text-brand-accent">Vendas</span>
+        <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
+          {/* eslint-disable-next-line @next/next/no-img-element -- logo pequena e fixa, não precisa do otimizador */}
+          <img src="/logo.png" alt="Gonça das Vendas" className="h-11 w-auto" />
+          <span aria-hidden="true" className="hidden sm:inline">
+            Goncadas<span className="text-brand-accent">Vendas</span>
+          </span>
           <span className="sr-only"> — página inicial</span>
         </Link>
 
