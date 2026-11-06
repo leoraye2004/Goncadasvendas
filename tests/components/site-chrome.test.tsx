@@ -11,6 +11,13 @@ import SiteHeader from "@/components/SiteHeader";
 beforeEach(() => vi.clearAllMocks());
 
 describe("SiteHeader", () => {
+  it("mostra a logo, que leva para a página inicial", () => {
+    render(<SiteHeader user={null} />);
+
+    expect(screen.getByRole("img", { name: "Gonça das Vendas" }).getAttribute("src")).toBe("/logo.png");
+    expect(screen.getByRole("link", { name: /página inicial/i }).getAttribute("href")).toBe("/");
+  });
+
   it("visitante vê Entrar e Cadastrar", () => {
     render(<SiteHeader user={null} />);
 
@@ -87,12 +94,6 @@ describe("SiteHeader", () => {
     render(<SiteHeader user={null} />);
 
     expect(screen.queryByRole("link", { name: /Carrinho/ })).toBeNull();
-  });
-
-  it("a marca leva para a home", () => {
-    render(<SiteHeader user={null} />);
-
-    expect(screen.getByRole("link", { name: /GoncadasVendas/ }).getAttribute("href")).toBe("/");
   });
 });
 

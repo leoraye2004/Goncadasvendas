@@ -5,6 +5,7 @@ import { useState, type SubmitEvent } from "react";
 import { apiRequest } from "@/components/api-request";
 import { lookupCep } from "@/components/cep-lookup";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 
 export type AddressValues = {
   id: string;
@@ -22,6 +23,7 @@ const VAZIO = { cep: "", street: "", number: "", district: "", city: "", state: 
 // Quem valida de verdade é o servidor (address-service).
 export default function AddressForm({ address }: Readonly<{ address?: AddressValues }>) {
   const router = useRouter();
+  const toast = useToast();
   const [values, setValues] = useState(address ?? VAZIO);
   const [error, setError] = useState<string>();
   const [cepHint, setCepHint] = useState<string>();
@@ -47,7 +49,11 @@ export default function AddressForm({ address }: Readonly<{ address?: AddressVal
       ? await apiRequest(`/api/enderecos/${address.id}`, "PUT", corpo)
       : await apiRequest("/api/enderecos", "POST", corpo);
     setLoading(false);
-    if (erro) return setError(erro);
+    if (erro) {
+      toast.error(erro);
+      return setError(erro);
+    }
+    toast.success("Endereço salvo");
     router.push("/enderecos");
     router.refresh();
   }

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, type SubmitEvent } from "react";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 
 export type ProductFormValues = {
   id: string;
@@ -14,14 +15,21 @@ export type ProductFormValues = {
 };
 
 const CATEGORIAS = ["Roupas", "Calçados", "Acessórios"];
+const MENSAGEM_ERRO = "Não foi possível salvar o produto. Tente novamente.";
 
 const textoDoBotao = (product?: ProductFormValues) => (product ? "Salvar alterações" : "Cadastrar produto");
 
 // UC03 — cadastro e edição de produto (com várias imagens). As regras ficam no servidor (product-service).
 export default function ProductForm({ product }: Readonly<{ product?: ProductFormValues }>) {
   const router = useRouter();
+  const toast = useToast();
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
+
+  const falhar = (mensagem: string) => {
+    toast.error(mensagem);
+    setError(mensagem);
+  };
 
   const rotuloDoBotao = loading ? "Salvando..." : textoDoBotao(product);
 
@@ -36,13 +44,14 @@ export default function ProductForm({ product }: Readonly<{ product?: ProductFor
       });
       if (!resposta.ok) {
         const corpo = await resposta.json().catch(() => ({}));
-        setError(corpo.error ?? "Não foi possível salvar o produto. Tente novamente.");
+        falhar(corpo.error ?? MENSAGEM_ERRO);
         return;
       }
+      toast.success("Produto salvo");
       router.push("/admin/produtos");
       router.refresh();
     } catch {
-      setError("Não foi possível salvar o produto. Tente novamente.");
+      falhar(MENSAGEM_ERRO);
     } finally {
       setLoading(false);
     }

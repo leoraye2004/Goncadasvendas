@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import { useState, type SubmitEvent } from "react";
 import { apiRequest } from "@/components/api-request";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 
 // UC05 — botão da página do produto. Visitante é convidado a entrar (RN01); logado escolhe a quantidade.
 export default function AddToCartButton({ productId, loggedIn }: Readonly<{ productId: string; loggedIn: boolean }>) {
   const router = useRouter();
+  const toast = useToast();
   const [quantity, setQuantity] = useState("1");
   const [error, setError] = useState<string>();
   const [added, setAdded] = useState(false);
@@ -29,7 +31,11 @@ export default function AddToCartButton({ productId, loggedIn }: Readonly<{ prod
     setLoading(true);
     const erro = await apiRequest("/api/carrinho", "POST", { productId, quantity });
     setLoading(false);
-    if (erro) return setError(erro);
+    if (erro) {
+      toast.error(erro);
+      return setError(erro);
+    }
+    toast.success("Produto adicionado ao carrinho");
     setAdded(true);
     router.refresh();
   }

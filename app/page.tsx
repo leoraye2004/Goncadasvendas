@@ -1,3 +1,4 @@
+import Link from "next/link";
 import CategoryFilter from "@/components/CategoryFilter";
 import ProductCard from "@/components/ProductCard";
 import { catalogService } from "@/lib/catalog";
@@ -31,10 +32,7 @@ export default async function Home({ searchParams }: Readonly<{ searchParams: Pr
         {categories.length > 0 && <CategoryFilter categories={categories} selected={selected} />}
 
         {products.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-line bg-white p-12 text-center">
-            <h2 className="text-xl font-semibold">Nossa vitrine está sendo preparada</h2>
-            <p className="mt-2 text-muted">Em breve novos produtos por aqui. Volte já!</p>
-          </div>
+          <VitrineVazia filtrada={Boolean(categoria)} />
         ) : (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
             {products.map((produto) => (
@@ -54,5 +52,24 @@ export default async function Home({ searchParams }: Readonly<{ searchParams: Pr
         )}
       </main>
     </>
+  );
+}
+
+// Estado vazio: sem filtro a loja ainda não tem produtos; com filtro, é só aquela categoria que está vazia.
+function VitrineVazia({ filtrada }: Readonly<{ filtrada: boolean }>) {
+  return (
+    <div className="rounded-2xl border border-dashed border-line bg-white p-12 text-center">
+      <h2 className="text-xl font-semibold">
+        {filtrada ? "Nenhum produto nesta categoria" : "Nossa vitrine está sendo preparada"}
+      </h2>
+      <p className="mt-2 text-muted">
+        {filtrada ? "Tente outra categoria ou veja tudo o que temos." : "Em breve novos produtos por aqui. Volte já!"}
+      </p>
+      {filtrada && (
+        <Link href="/" className="btn btn-primary mt-5">
+          Ver todos os produtos
+        </Link>
+      )}
+    </div>
   );
 }

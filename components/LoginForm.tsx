@@ -5,14 +5,21 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState, type SubmitEvent } from "react";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 
 const campo = "form-control";
 
 // UC02 — login. A mensagem de erro é sempre a mesma, para não revelar se o e-mail existe.
 export default function LoginForm({ justRegistered = false }: Readonly<{ justRegistered?: boolean }>) {
   const router = useRouter();
+  const toast = useToast();
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
+
+  const falhar = (mensagem: string) => {
+    toast.error(mensagem);
+    setError(mensagem);
+  };
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,13 +33,14 @@ export default function LoginForm({ justRegistered = false }: Readonly<{ justReg
         redirect: false,
       });
       if (!result || result.error) {
-        setError("E-mail ou senha inválidos");
+        falhar("E-mail ou senha inválidos");
         return;
       }
+      toast.success("Bem-vindo de volta!");
       router.push("/");
       router.refresh();
     } catch {
-      setError("Não foi possível entrar agora. Tente novamente.");
+      falhar("Não foi possível entrar agora. Tente novamente.");
     } finally {
       setLoading(false);
     }

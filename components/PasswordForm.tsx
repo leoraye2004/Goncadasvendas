@@ -3,9 +3,11 @@
 import { useState, type SubmitEvent } from "react";
 import { apiRequest } from "@/components/api-request";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 
 // RF10 — troca de senha. Pede a senha atual; quem confere é o profile-service (aqui só a confirmação digitada).
 export default function PasswordForm() {
+  const toast = useToast();
   const [error, setError] = useState<string>();
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -16,7 +18,10 @@ export default function PasswordForm() {
     const dados = new FormData(form);
     setError(undefined);
     setSaved(false);
-    if (dados.get("newPassword") !== dados.get("confirmation")) return setError("As senhas não conferem");
+    if (dados.get("newPassword") !== dados.get("confirmation")) {
+      toast.error("As senhas não conferem");
+      return setError("As senhas não conferem");
+    }
 
     setLoading(true);
     const erro = await apiRequest("/api/conta/senha", "PUT", {
@@ -24,7 +29,11 @@ export default function PasswordForm() {
       newPassword: dados.get("newPassword"),
     });
     setLoading(false);
-    if (erro) return setError(erro);
+    if (erro) {
+      toast.error(erro);
+      return setError(erro);
+    }
+    toast.success("Senha alterada");
     setSaved(true);
     form.reset();
   }

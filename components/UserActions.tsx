@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiRequest } from "@/components/api-request";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 
 type Props = Readonly<{ id: string; name: string; role: "ADMIN" | "CUSTOMER"; self: boolean }>;
 
@@ -11,32 +12,35 @@ type Props = Readonly<{ id: string; name: string; role: "ADMIN" | "CUSTOMER"; se
 // ações (o service também recusa, isto só evita o botão inútil).
 export default function UserActions({ id, name, role, self }: Props) {
   const router = useRouter();
+  const toast = useToast();
   const [papel, setPapel] = useState(role);
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
 
   if (self) return <span className="text-sm text-muted">Você</span>;
 
-  async function executar(chamada: () => Promise<string | null>, aoFalhar?: () => void) {
+  async function executar(chamada: () => Promise<string | null>, sucesso: string, aoFalhar?: () => void) {
     setError(undefined);
     setLoading(true);
     const erro = await chamada();
     setLoading(false);
     if (erro) {
       aoFalhar?.();
+      toast.error(erro);
       return setError(erro);
     }
+    toast.success(sucesso);
     router.refresh();
   }
 
   const trocarPapel = (novo: "ADMIN" | "CUSTOMER") => {
     setPapel(novo);
-    return executar(() => apiRequest(`/api/admin/usuarios/${id}`, "PATCH", { role: novo }), () => setPapel(role));
+    return executar(() => apiRequest(`/api/admin/usuarios/${id}`, "PATCH", { role: novo }), "Papel atualizado", () => setPapel(role));
   };
 
   const excluir = () => {
     if (!window.confirm(`Excluir o usuário "${name}"? Os pedidos dele continuam guardados.`)) return;
-    return executar(() => apiRequest(`/api/admin/usuarios/${id}`, "DELETE"));
+    return executar(() => apiRequest(`/api/admin/usuarios/${id}`, "DELETE"), "Usuário excluído");
   };
 
   return (

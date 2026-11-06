@@ -4,12 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState, type SubmitEvent } from "react";
 import { apiRequest } from "@/components/api-request";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 
 type Profile = { name: string; email: string; birthDate: string };
 
 // RF10 — edita nome, e-mail e nascimento. As regras (e-mail único, datas) ficam no profile-service.
 export default function ProfileForm({ profile }: Readonly<{ profile: Profile }>) {
   const router = useRouter();
+  const toast = useToast();
   const [error, setError] = useState<string>();
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -22,7 +24,11 @@ export default function ProfileForm({ profile }: Readonly<{ profile: Profile }>)
     setLoading(true);
     const erro = await apiRequest("/api/conta/perfil", "PUT", dados);
     setLoading(false);
-    if (erro) return setError(erro);
+    if (erro) {
+      toast.error(erro);
+      return setError(erro);
+    }
+    toast.success("Dados atualizados");
     setSaved(true);
     router.refresh(); // o nome no cabeçalho vem da sessão, que o servidor atualiza a cada requisição
   }
