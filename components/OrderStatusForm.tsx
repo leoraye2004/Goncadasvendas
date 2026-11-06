@@ -4,12 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState, type SubmitEvent } from "react";
 import { apiRequest } from "@/components/api-request";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 import { STATUS_LABEL } from "@/lib/format";
 import { NEXT_STATUS, type OrderStatusName } from "@/lib/order-status";
 
 // UC10 — o admin escolhe o próximo status do pedido. Só aparecem as opções válidas (o service confere de novo).
 export default function OrderStatusForm({ id, status }: Readonly<{ id: string; status: OrderStatusName }>) {
   const router = useRouter();
+  const toast = useToast();
   const opcoes = NEXT_STATUS[status];
   const [novo, setNovo] = useState(opcoes[0]);
   const [error, setError] = useState<string>();
@@ -23,7 +25,11 @@ export default function OrderStatusForm({ id, status }: Readonly<{ id: string; s
     setLoading(true);
     const erro = await apiRequest(`/api/admin/pedidos/${id}`, "PATCH", { status: novo });
     setLoading(false);
-    if (erro) return setError(erro);
+    if (erro) {
+      toast.error(erro);
+      return setError(erro);
+    }
+    toast.success("Status do pedido atualizado");
     router.refresh();
   }
 

@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiRequest } from "@/components/api-request";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 
 type Props = Readonly<{ productId: string; loggedIn: boolean; favorite: boolean }>;
 
 // UC07 — botão de favoritar (página do produto e lista de favoritos). Visitante é convidado a entrar (RN01).
 export default function FavoriteButton({ productId, loggedIn, favorite }: Props) {
   const router = useRouter();
+  const toast = useToast();
   const [isFavorite, setIsFavorite] = useState(favorite);
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
@@ -30,7 +32,11 @@ export default function FavoriteButton({ productId, loggedIn, favorite }: Props)
       ? await apiRequest(`/api/favoritos/${productId}`, "DELETE")
       : await apiRequest("/api/favoritos", "POST", { productId });
     setLoading(false);
-    if (erro) return setError(erro);
+    if (erro) {
+      toast.error(erro);
+      return setError(erro);
+    }
+    toast.success(isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos");
     setIsFavorite(!isFavorite);
     router.refresh();
   }

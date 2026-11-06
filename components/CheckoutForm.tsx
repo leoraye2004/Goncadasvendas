@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { useState, type SubmitEvent } from "react";
 import { apiCall } from "@/components/api-request";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 
 export type AddressOption = { id: string; label: string };
 
 // UC06 — escolhe o endereço e confirma o pedido. O servidor confere carrinho, endereço e login (order-service).
 export default function CheckoutForm({ addresses }: Readonly<{ addresses: AddressOption[] }>) {
   const router = useRouter();
+  const toast = useToast();
   const [addressId, setAddressId] = useState(addresses[0]?.id ?? "");
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
@@ -32,7 +34,11 @@ export default function CheckoutForm({ addresses }: Readonly<{ addresses: Addres
     setLoading(true);
     const resposta = await apiCall("/api/pedidos", "POST", { addressId });
     setLoading(false);
-    if (!resposta.data) return setError(resposta.error);
+    if (!resposta.data) {
+      toast.error(resposta.error);
+      return setError(resposta.error);
+    }
+    toast.success("Pedido confirmado!");
     router.push(`/pedidos/${resposta.data.id}?confirmado=1`);
     router.refresh();
   }

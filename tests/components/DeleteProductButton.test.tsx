@@ -1,9 +1,10 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { refresh } = vi.hoisted(() => ({ refresh: vi.fn() }));
+const { refresh, toast } = vi.hoisted(() => ({ refresh: vi.fn(), toast: { success: vi.fn(), error: vi.fn() } }));
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh }) }));
+vi.mock("@/components/ToastProvider", () => ({ useToast: () => toast }));
 
 import DeleteProductButton from "@/components/DeleteProductButton";
 
@@ -51,7 +52,7 @@ describe("DeleteProductButton", () => {
 
     clicar();
 
-    await waitFor(() => expect(alertMock).toHaveBeenCalledWith(expect.stringContaining("desativado")));
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith(expect.stringContaining("desativado")));
     expect(refresh).toHaveBeenCalled();
   });
 
@@ -62,7 +63,8 @@ describe("DeleteProductButton", () => {
 
     clicar();
 
-    await waitFor(() => expect(alertMock).toHaveBeenCalledWith("Produto não encontrado"));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Produto não encontrado"));
+    expect(alertMock).not.toHaveBeenCalled();
     expect(refresh).not.toHaveBeenCalled();
   });
 });

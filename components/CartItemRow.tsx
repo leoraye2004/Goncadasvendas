@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiRequest } from "@/components/api-request";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 import { formatBRL } from "@/lib/format";
 
 export type CartLine = {
@@ -20,13 +21,18 @@ export type CartLine = {
 // Uma linha do carrinho: foto, nome, quantidade editável, subtotal e botão de excluir.
 export default function CartItemRow({ item }: Readonly<{ item: CartLine }>) {
   const router = useRouter();
+  const toast = useToast();
   const [quantity, setQuantity] = useState(String(item.quantity));
   const [error, setError] = useState<string>();
 
   async function enviar(method: "PATCH" | "DELETE") {
     setError(undefined);
     const erro = await apiRequest(`/api/carrinho/${item.id}`, method, method === "PATCH" ? { quantity } : undefined);
-    if (erro) return setError(erro);
+    if (erro) {
+      toast.error(erro);
+      return setError(erro);
+    }
+    toast.success(method === "PATCH" ? "Quantidade atualizada" : "Item removido do carrinho");
     router.refresh();
   }
 

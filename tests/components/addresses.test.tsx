@@ -6,6 +6,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh }) }));
 
 import AddressForm from "@/components/AddressForm";
 import DeleteAddressButton from "@/components/DeleteAddressButton";
+import { ToastProvider } from "@/components/ToastProvider";
 import { lookupCep } from "@/components/cep-lookup";
 
 const fetchMock = vi.fn();
@@ -167,14 +168,16 @@ describe("DeleteAddressButton", () => {
   });
 
   it("avisa se o servidor recusar", async () => {
-    const alerta = vi.fn();
-    vi.stubGlobal("alert", alerta);
     fetchMock.mockResolvedValue({ ok: false, json: async () => ({ error: "Endereço não encontrado" }) });
-    render(<DeleteAddressButton id="a1" />);
+    render(
+      <ToastProvider>
+        <DeleteAddressButton id="a1" />
+      </ToastProvider>,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "Excluir" }));
 
-    await waitFor(() => expect(alerta).toHaveBeenCalledWith("Endereço não encontrado"));
+    expect((await screen.findByRole("alert")).textContent).toContain("Endereço não encontrado");
     expect(refresh).not.toHaveBeenCalled();
   });
 });

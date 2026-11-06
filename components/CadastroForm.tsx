@@ -4,14 +4,22 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type SubmitEvent } from "react";
 import FormError from "@/components/FormError";
+import { useToast } from "@/components/ToastProvider";
 
 const campo = "form-control";
+const MENSAGEM_ERRO = "Não foi possível concluir o cadastro. Tente novamente.";
 
 // UC01 — cadastro. As regras ficam no servidor (auth-service); aqui só enviamos e mostramos o erro.
 export default function CadastroForm() {
   const router = useRouter();
+  const toast = useToast();
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
+
+  const falhar = (mensagem: string) => {
+    toast.error(mensagem);
+    setError(mensagem);
+  };
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,12 +34,13 @@ export default function CadastroForm() {
       });
       if (!resposta.ok) {
         const corpo = await resposta.json().catch(() => ({}));
-        setError(corpo.error ?? "Não foi possível concluir o cadastro. Tente novamente.");
+        falhar(corpo.error ?? MENSAGEM_ERRO);
         return;
       }
+      toast.success("Cadastro concluído! Entre com seu e-mail e senha.");
       router.push("/login?cadastro=ok");
     } catch {
-      setError("Não foi possível concluir o cadastro. Tente novamente.");
+      falhar(MENSAGEM_ERRO);
     } finally {
       setLoading(false);
     }
