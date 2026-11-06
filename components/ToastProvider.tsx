@@ -40,18 +40,28 @@ export function ToastProvider({ children }: Readonly<{ children: ReactNode }>) {
     <ToastContext.Provider value={api}>
       {children}
       <div className="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col items-end gap-2 sm:left-auto">
-        {avisos.map((aviso) => (
-          <div
-            key={aviso.id}
-            role={aviso.tipo === "error" ? "alert" : "status"}
-            className={`${aviso.tipo === "error" ? "form-error" : "form-success"} pointer-events-auto flex w-full max-w-sm items-start gap-3 shadow-lg`}
-          >
-            <span className="flex-1">{aviso.mensagem}</span>
-            <button type="button" onClick={() => fechar(aviso.id)} aria-label="Fechar aviso" className="font-bold leading-none">
-              ×
-            </button>
-          </div>
-        ))}
+        {avisos.map((aviso) => {
+          const erro = aviso.tipo === "error";
+          const classe = `${erro ? "form-error" : "form-success"} pointer-events-auto flex w-full max-w-sm items-start gap-3 shadow-lg`;
+          const conteudo = (
+            <>
+              <span className="flex-1">{aviso.mensagem}</span>
+              <button type="button" onClick={() => fechar(aviso.id)} aria-label="Fechar aviso" className="font-bold leading-none">
+                ×
+              </button>
+            </>
+          );
+          // Sucesso usa <output> (já é "status" para leitores de tela); erro usa role="alert", que é lido na hora.
+          return erro ? (
+            <div key={aviso.id} role="alert" className={classe}>
+              {conteudo}
+            </div>
+          ) : (
+            <output key={aviso.id} className={classe}>
+              {conteudo}
+            </output>
+          );
+        })}
       </div>
     </ToastContext.Provider>
   );
